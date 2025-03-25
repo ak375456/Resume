@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 
 fun editPdf(context: Context, userName: String) {
     val assetManager = context.assets
-    val inputStream = assetManager.open("cv2.pdf")
+    val inputStream = assetManager.open("cv1.pdf")
     val outputFile = File(context.filesDir, "edited_cv.pdf")
 
     PdfReader(inputStream).use { reader ->
