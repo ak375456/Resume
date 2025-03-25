@@ -5,9 +5,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Scaffold
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.example.resumegenerator.screens.SetupNavGraph
 import com.example.resumegenerator.ui.theme.ResumeGeneratorTheme
@@ -34,7 +31,7 @@ class MainActivity : ComponentActivity() {
 
 fun editPdf(context: Context, userName: String) {
     val assetManager = context.assets
-    val inputStream = assetManager.open("cv1.pdf")
+    val inputStream = assetManager.open("business/cv1.pdf")
     val outputFile = File(context.filesDir, "edited_cv.pdf")
 
     PdfReader(inputStream).use { reader ->
