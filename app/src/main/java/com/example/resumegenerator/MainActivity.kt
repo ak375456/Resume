@@ -1,17 +1,21 @@
 package com.example.resumegenerator
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
+import com.example.resumegenerator.screens.SetupNavGraph
 import com.example.resumegenerator.ui.theme.ResumeGeneratorTheme
+import com.itextpdf.forms.PdfAcroForm
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfReader
+import com.itextpdf.kernel.pdf.PdfWriter
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +23,30 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ResumeGeneratorTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                val navController = rememberNavController()
+                SetupNavGraph(navController = navController)
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ResumeGeneratorTheme {
-        Greeting("Android")
+
+fun editPdf(context: Context, userName: String) {
+    val assetManager = context.assets
+    val inputStream = assetManager.open("cv2.pdf")
+    val outputFile = File(context.filesDir, "edited_cv.pdf")
+
+    PdfReader(inputStream).use { reader ->
+        PdfWriter(outputFile).use { writer ->
+            val pdfDoc = PdfDocument(reader, writer)
+            val form = PdfAcroForm.getAcroForm(pdfDoc, true)
+
+            // Set the value of the form field named "NameField"
+            form.getField("NameField")?.setValue(userName)
+            println(userName)
+
+            pdfDoc.close()
+        }
     }
 }
