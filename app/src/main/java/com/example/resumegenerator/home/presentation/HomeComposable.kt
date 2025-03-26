@@ -57,21 +57,3 @@ fun HomeComposable(navController: NavHostController) {
         }
     }
 }
-
-fun editPdf(context: Context, userName: String) {
-    val assetManager = context.assets
-    val inputStream = assetManager.open("resume_form.pdf") // Your LibreOffice PDF
-    val outputFile = File(context.filesDir, "filled_resume.pdf")
-
-    PdfReader(inputStream).use { reader ->
-        PdfWriter(outputFile).use { writer ->
-            val pdfDoc = PdfDocument(reader, writer)
-            val form = PdfAcroForm.getAcroForm(pdfDoc, true)
-
-            // Fill the field (match "NameField" with LibreOffice field name)
-            form.getField("NameField")?.setValue(userName)
-
-            pdfDoc.close()
-        }
-    }
-}

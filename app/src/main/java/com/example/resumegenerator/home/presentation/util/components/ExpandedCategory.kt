@@ -37,7 +37,6 @@ fun ExpandableCategory(
     onTemplateClick: (Template) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Category Header (Clickable)
         Surface(
             onClick = onCategoryClick,
             modifier = Modifier
@@ -53,7 +52,6 @@ fun ExpandableCategory(
             )
         }
 
-        // Replace LazyVerticalGrid with Column+Row grid
         AnimatedVisibility(
             visible = isExpanded,
             enter = expandVertically() + fadeIn(),

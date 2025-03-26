@@ -1,6 +1,7 @@
 package com.example.resumegenerator.home.presentation
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,7 +44,7 @@ fun EditorComposable(templatePath: String) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        // Add more fields as needed...
+        // Add more fields
 
         Button(
             onClick = {
@@ -52,7 +53,7 @@ fun EditorComposable(templatePath: String) {
                     templatePath = templatePath,
                     fields = listOf(
                         "NameField" to name,
-                        "RoleField" to email,
+                        "DesiredRole" to email,
                         "DetailField" to email
                         // Add other field mappings
                     )
@@ -79,6 +80,8 @@ fun editPdf(
             PdfWriter(outputFile).use { writer ->
                 val pdfDoc = PdfDocument(reader, writer)
                 val form = PdfAcroForm.getAcroForm(pdfDoc, true)
+
+                Log.d("PDF_DEBUG", "Detected fields: ${form?.formFields?.keys}")
 
                 fields.forEach { (fieldName, value) ->
                     form.getField(fieldName)?.setValue(value)
