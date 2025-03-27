@@ -9,7 +9,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -25,43 +27,29 @@ import java.io.File
 @Composable
 fun EditorComposable(templatePath: String) {
     val context = LocalContext.current
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    // Add other fields as needed
+    val fieldValues = remember { mutableStateMapOf<String, String>() }
 
-    Column (modifier = Modifier.padding(16.dp)) {
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Full Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
+    LaunchedEffect(templatePath) {
+        detectPdfFields(context, templatePath).keys.forEach { fieldName ->
+            fieldValues[fieldName] = ""
+        }
+    }
 
-        TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Add more fields
+    Column(Modifier.padding(16.dp)) {
+        fieldValues.keys.forEach { fieldName ->
+            TextField(
+                value = fieldValues[fieldName] ?: "",
+                onValueChange = { fieldValues[fieldName] = it },
+                label = { Text(fieldName.removeSuffix("Field")) },
+                modifier = Modifier.fillMaxWidth().padding(4.dp)
+            )
+        }
 
         Button(
             onClick = {
-                editPdf(
-                    context = context,
-                    templatePath = templatePath,
-                    fields = listOf(
-                        "NameField" to name,
-                        "DesiredRole" to email,
-                        "DetailField" to email
-                        // Add other field mappings
-                    )
-                )
+                editPdf(context, templatePath, fieldValues)  // Using your original editPdf
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
+            modifier = Modifier.padding(top = 16.dp)
         ) {
             Text("Generate PDF")
         }
@@ -71,24 +59,51 @@ fun EditorComposable(templatePath: String) {
 fun editPdf(
     context: Context,
     templatePath: String,
-    fields: List<Pair<String, String>>
+    fields: Map<String, String>  // Changed from List<Pair> to Map
 ) {
     val outputFile = File(context.filesDir, "generated_resume_${System.currentTimeMillis()}.pdf")
 
-    context.assets.open(templatePath).use { inputStream ->
-        PdfReader(inputStream).use { reader ->
-            PdfWriter(outputFile).use { writer ->
-                val pdfDoc = PdfDocument(reader, writer)
-                val form = PdfAcroForm.getAcroForm(pdfDoc, true)
+    try {
+        context.assets.open(templatePath).use { inputStream ->
+            PdfReader(inputStream).use { reader ->
+                PdfWriter(outputFile).use { writer ->
+                    PdfDocument(reader, writer).use { pdfDoc ->
+                        val form = PdfAcroForm.getAcroForm(pdfDoc, true)
 
-                Log.d("PDF_DEBUG", "Detected fields: ${form?.formFields?.keys}")
+                        // Debug: Log all detected fields
+                        Log.d("PDF_DEBUG", "All fields in template: ${form?.formFields?.keys}")
 
-                fields.forEach { (fieldName, value) ->
-                    form.getField(fieldName)?.setValue(value)
+                        // Fill each field
+                        fields.forEach { (fieldName, value) ->
+                            form?.getField(fieldName)?.apply {
+                                setValue(value)
+                                Log.d("PDF_DEBUG", "Set field: $fieldName = $value")
+                            } ?: Log.w("PDF_DEBUG", "Field not found: $fieldName")
+                        }
+
+                        // Finalize PDF
+                        pdfDoc.close()
+                        Log.d("PDF_DEBUG", "PDF saved to: ${outputFile.absolutePath}")
+                    }
                 }
-
-                pdfDoc.close()
             }
         }
+    } catch (e: Exception) {
+        Log.e("PDF_ERROR", "Failed to edit PDF", e)
+        // You might want to show an error to the user here
+    }
+}
+
+fun detectPdfFields(context: Context, templatePath: String): Map<String, String> {
+    return try {
+        context.assets.open(templatePath).use { input ->
+            PdfReader(input).use { reader ->
+                val form = PdfAcroForm.getAcroForm(PdfDocument(reader), false)
+                form?.formFields?.mapValues { it.value.toString() } ?: emptyMap()
+            }
+        }
+    } catch (e: Exception) {
+        Log.e("PDF_FIELDS", "Error detecting fields", e)
+        emptyMap()
     }
 }
