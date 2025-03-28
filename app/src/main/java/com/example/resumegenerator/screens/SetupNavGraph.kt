@@ -6,8 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import androidx.navigation.navigation
-import com.example.resumegenerator.home.presentation.EditorComposable
+import com.example.resumegenerator.home.presentation.EditorScreen
 import com.example.resumegenerator.home.presentation.HomeComposable
 import java.net.URLDecoder
 
@@ -25,10 +24,13 @@ fun SetupNavGraph(navController: NavHostController) {
         composable(
             route = Screens.Editor.route,
             arguments = listOf(navArgument("templatePath") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val encodedPath = backStackEntry.arguments?.getString("templatePath") ?: ""
-                val templatePath = URLDecoder.decode(encodedPath, "UTF-8")
-                EditorComposable(templatePath = templatePath)
-            }
+        ) { backStackEntry ->
+            val encodedPath = backStackEntry.arguments?.getString("templatePath") ?: ""
+            val templatePath = URLDecoder.decode(encodedPath, "UTF-8")
+            EditorScreen(
+                templatePath = templatePath,
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }

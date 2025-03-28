@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +21,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.resumegenerator.editor.presentation.EditorState
+import com.example.resumegenerator.editor.presentation.EditorViewModel
 import com.itextpdf.forms.PdfAcroForm
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
@@ -25,85 +31,68 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import java.io.File
 
 @Composable
-fun EditorComposable(templatePath: String) {
-    val context = LocalContext.current
-    val fieldValues = remember { mutableStateMapOf<String, String>() }
-
-    LaunchedEffect(templatePath) {
-        detectPdfFields(context, templatePath).keys.forEach { fieldName ->
-            fieldValues[fieldName] = ""
-        }
-    }
-
-    Column(Modifier.padding(16.dp)) {
-        fieldValues.keys.forEach { fieldName ->
-            TextField(
-                value = fieldValues[fieldName] ?: "",
-                onValueChange = { fieldValues[fieldName] = it },
-                label = { Text(fieldName.removeSuffix("Field")) },
-                modifier = Modifier.fillMaxWidth().padding(4.dp)
-            )
-        }
-
-        Button(
-            onClick = {
-                editPdf(context, templatePath, fieldValues)  // Using your original editPdf
-            },
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text("Generate PDF")
-        }
-    }
-}
-
-fun editPdf(
-    context: Context,
+fun EditorScreen(
     templatePath: String,
-    fields: Map<String, String>  // Changed from List<Pair> to Map
+    viewModel: EditorViewModel = hiltViewModel(),
+    onBack: () -> Unit
 ) {
-    val outputFile = File(context.filesDir, "generated_resume_${System.currentTimeMillis()}.pdf")
+    // Pass the templatePath to ViewModel when it changes
+    LaunchedEffect(templatePath) {
+        viewModel.setTemplatePath(templatePath)
+    }
 
-    try {
-        context.assets.open(templatePath).use { inputStream ->
-            PdfReader(inputStream).use { reader ->
-                PdfWriter(outputFile).use { writer ->
-                    PdfDocument(reader, writer).use { pdfDoc ->
-                        val form = PdfAcroForm.getAcroForm(pdfDoc, true)
+    val uiState by viewModel.uiState.collectAsState()
 
-                        // Debug: Log all detected fields
-                        Log.d("PDF_DEBUG", "All fields in template: ${form?.formFields?.keys}")
+    if (uiState.isSuccess) {
+        LaunchedEffect(Unit) {
+            onBack()
+        }
+    }
 
-                        // Fill each field
-                        fields.forEach { (fieldName, value) ->
-                            form?.getField(fieldName)?.apply {
-                                setValue(value)
-                                Log.d("PDF_DEBUG", "Set field: $fieldName = $value")
-                            } ?: Log.w("PDF_DEBUG", "Field not found: $fieldName")
-                        }
+    EditorContent(
+        uiState = uiState,
+        onFieldValueChange = viewModel::updateFieldValue,
+        onGenerateClick = viewModel::generatePdf
+    )
+}
+@Composable
+private fun EditorContent(
+    uiState: EditorState,
+    onFieldValueChange: (String, String) -> Unit,
+    onGenerateClick: () -> Unit
+) {
+    Column(Modifier.padding(16.dp)) {
+        if (uiState.isLoading) {
+            CircularProgressIndicator()
+        } else {
+            uiState.error?.let { error ->
+                Text(text = error, color = MaterialTheme.colorScheme.error)
+            }
 
-                        // Finalize PDF
-                        pdfDoc.close()
-                        Log.d("PDF_DEBUG", "PDF saved to: ${outputFile.absolutePath}")
-                    }
+            uiState.fields.keys.forEach { fieldName ->
+                TextField(
+                    value = uiState.fields[fieldName] ?: "",
+                    onValueChange = { onFieldValueChange(fieldName, it) },
+                    label = { Text(fieldName.removeSuffix("Field")) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                )
+            }
+
+            Button(
+                onClick = onGenerateClick,
+                modifier = Modifier.padding(top = 16.dp),
+                enabled = !uiState.isGenerating
+            ) {
+                if (uiState.isGenerating) {
+                    CircularProgressIndicator()
                 }
+                Text("Generate PDF")
             }
         }
-    } catch (e: Exception) {
-        Log.e("PDF_ERROR", "Failed to edit PDF", e)
-        // You might want to show an error to the user here
     }
 }
 
-fun detectPdfFields(context: Context, templatePath: String): Map<String, String> {
-    return try {
-        context.assets.open(templatePath).use { input ->
-            PdfReader(input).use { reader ->
-                val form = PdfAcroForm.getAcroForm(PdfDocument(reader), false)
-                form?.formFields?.mapValues { it.value.toString() } ?: emptyMap()
-            }
-        }
-    } catch (e: Exception) {
-        Log.e("PDF_FIELDS", "Error detecting fields", e)
-        emptyMap()
-    }
-}
+
+
