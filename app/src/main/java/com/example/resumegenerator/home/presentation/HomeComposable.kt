@@ -1,6 +1,6 @@
 package com.example.resumegenerator.home.presentation
 
-import android.content.Context
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,11 +17,6 @@ import androidx.navigation.NavHostController
 import com.example.resumegenerator.home.presentation.util.components.DynamicTemplateRepository
 import com.example.resumegenerator.home.presentation.util.components.ExpandableCategory
 import com.example.resumegenerator.screens.Screens
-import com.itextpdf.forms.PdfAcroForm
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfReader
-import com.itextpdf.kernel.pdf.PdfWriter
-import java.io.File
 import java.net.URLEncoder
 
 @Composable

@@ -1,7 +1,5 @@
 package com.example.resumegenerator.home.presentation
 
-import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,21 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.resumegenerator.editor.presentation.EditorState
 import com.example.resumegenerator.editor.presentation.EditorViewModel
-import com.itextpdf.forms.PdfAcroForm
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfReader
-import com.itextpdf.kernel.pdf.PdfWriter
-import java.io.File
 
 @Composable
 fun EditorScreen(
@@ -36,7 +24,7 @@ fun EditorScreen(
     viewModel: EditorViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
-    // Pass the templatePath to ViewModel when it changes
+
     LaunchedEffect(templatePath) {
         viewModel.setTemplatePath(templatePath)
     }

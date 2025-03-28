@@ -2,6 +2,7 @@ package com.example.resumegenerator.di
 
 
 import android.content.Context
+import com.example.resumegenerator.editor.data.repository.PdfRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +13,7 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object AppModule {
     @Provides
-    fun provideApplicationContext(@ApplicationContext context: Context): Context {
-        return context
+    fun providePdfRepository(@ApplicationContext context: Context): PdfRepository {
+        return PdfRepository(context)
     }
 }
