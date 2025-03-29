@@ -1,4 +1,4 @@
-package com.example.resumegenerator.home.presentation
+package com.example.resumegenerator.editor.presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,8 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.resumegenerator.editor.presentation.EditorState
-import com.example.resumegenerator.editor.presentation.EditorViewModel
 
 @Composable
 fun EditorScreen(

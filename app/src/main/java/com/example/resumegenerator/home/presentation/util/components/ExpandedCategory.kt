@@ -20,12 +20,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.resumegenerator.home.presentation.util.models.Template
 import com.example.resumegenerator.home.presentation.util.models.TemplateCategory
+import com.example.resumegenerator.screens.Screens
+import java.net.URLEncoder
 import kotlin.collections.chunked
 import kotlin.collections.forEach
 
@@ -34,8 +41,10 @@ fun ExpandableCategory(
     category: TemplateCategory,
     isExpanded: Boolean,
     onCategoryClick: () -> Unit,
-    onTemplateClick: (Template) -> Unit
+    onTemplateClick: (Template) -> Unit,
+    navController: NavHostController
 ) {
+    var selectedTemplate by remember { mutableStateOf<Template?>(null) }
     Column(modifier = Modifier.fillMaxWidth()) {
         Surface(
             onClick = onCategoryClick,
@@ -52,15 +61,8 @@ fun ExpandableCategory(
             )
         }
 
-        AnimatedVisibility(
-            visible = isExpanded,
-            enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut()
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 8.dp)
-            ) {
-                // Split templates into rows of 2
+        AnimatedVisibility(visible = isExpanded) {
+            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 category.templates.chunked(2).forEach { rowTemplates ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -70,10 +72,9 @@ fun ExpandableCategory(
                             TemplateCard(
                                 template = template,
                                 modifier = Modifier.weight(1f),
-                                onClick = { onTemplateClick(template) }
+                                onOptionSelected = { selectedTemplate = it }
                             )
                         }
-                        // Add empty spacer if odd number of items
                         if (rowTemplates.size % 2 != 0) {
                             Spacer(Modifier.weight(1f))
                         }
@@ -82,4 +83,18 @@ fun ExpandableCategory(
             }
         }
     }
+
+    selectedTemplate?.let { template ->
+        TemplateOptionsDialog(
+            template = template,
+            onDismiss = { selectedTemplate = null },
+
+            onCreateCv = {
+                val encodedPath = URLEncoder.encode(template.pdfAssetPath, "UTF-8")
+                navController.navigate(Screens.Editor.createRoute(encodedPath))
+                selectedTemplate = null
+            }
+        )
+    }
+
 }

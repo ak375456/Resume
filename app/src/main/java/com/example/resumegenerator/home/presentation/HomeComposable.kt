@@ -41,12 +41,14 @@ fun HomeComposable(navController: NavHostController) {
                     category = category,
                     isExpanded = expandedCategories[category.name] == true,
                     onCategoryClick = {
-                        expandedCategories[category.name] = expandedCategories[category.name] != true
+                        expandedCategories[category.name] =
+                            expandedCategories[category.name] != true
                     },
                     onTemplateClick = { template ->
                         val encodedPath = URLEncoder.encode(template.pdfAssetPath, "UTF-8")
                         navController.navigate(Screens.Editor.createRoute(encodedPath))
-                    }
+                    },
+                    navController = navController
                 )
             }
         }

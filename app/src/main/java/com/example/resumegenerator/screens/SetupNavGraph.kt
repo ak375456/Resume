@@ -6,7 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.resumegenerator.home.presentation.EditorScreen
+import com.example.resumegenerator.editor.presentation.EditorScreen
 import com.example.resumegenerator.home.presentation.HomeComposable
 import java.net.URLDecoder
 
