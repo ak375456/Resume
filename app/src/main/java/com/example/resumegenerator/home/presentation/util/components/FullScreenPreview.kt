@@ -31,13 +31,11 @@ fun FullScreenPreview(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Surface (
-            modifier = Modifier
-                .fillMaxSize()
-        ){
+        Surface(
+            modifier = Modifier.fillMaxSize()
+        ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top
             ) {
                 // Header with title and close button
@@ -59,22 +57,26 @@ fun FullScreenPreview(
                         )
                     }
                 }
+
+
                 ZoomableImage(
                     imageRes = template.thumbnailRes,
                     modifier = Modifier
                         .fillMaxSize()
                         .weight(1f),
-                    resetTrigger = resetCounter > 0
+                    resetTrigger = resetCounter
                 )
+
+
                 Button(
                     onClick = { resetCounter++ },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text("Reset Zoom")
                 }
+
                 Spacer(modifier = Modifier.height(36.dp))
             }
         }
-        }
-
+    }
 }

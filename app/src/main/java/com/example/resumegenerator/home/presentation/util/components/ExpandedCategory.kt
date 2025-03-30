@@ -17,13 +17,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.resumegenerator.home.presentation.util.models.Template
 import com.example.resumegenerator.home.presentation.util.models.TemplateCategory
-import com.example.resumegenerator.screens.Screens
-import java.net.URLEncoder
 import kotlin.collections.chunked
 import kotlin.collections.forEach
 
@@ -32,10 +29,10 @@ fun ExpandableCategory(
     category: TemplateCategory,
     isExpanded: Boolean,
     onCategoryClick: () -> Unit,
-    onTemplateClick: (Template) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     var selectedTemplate by remember { mutableStateOf<Template?>(null) }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         Surface(
             onClick = onCategoryClick,
@@ -61,10 +58,16 @@ fun ExpandableCategory(
                         rowTemplates.forEach { template ->
                             TemplateCard(
                                 template = template,
+                                isSelected = selectedTemplate == template, // Check if this template is selected
                                 modifier = Modifier.weight(1f),
-                                onOptionSelected = { selectedTemplate = it }
+                                onOptionSelected = {
+                                    selectedTemplate = if (selectedTemplate == it) null else it
+                                },
+                                navController = navController
                             )
                         }
+
+                        // Fill remaining space for uneven rows
                         if (rowTemplates.size % 2 != 0) {
                             Spacer(Modifier.weight(1f))
                         }
@@ -73,17 +76,4 @@ fun ExpandableCategory(
             }
         }
     }
-
-    selectedTemplate?.let { template ->
-        TemplateOptionsDialog(
-            template = template,
-            onDismiss = { selectedTemplate = null },
-            onCreateCv = {
-                val encodedPath = URLEncoder.encode(template.pdfAssetPath, "UTF-8")
-                navController.navigate(Screens.Editor.createRoute(encodedPath))
-                selectedTemplate = null
-            }
-        )
-    }
-
 }

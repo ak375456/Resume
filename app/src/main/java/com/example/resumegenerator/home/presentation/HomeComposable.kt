@@ -16,8 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.example.resumegenerator.home.presentation.util.components.DynamicTemplateRepository
 import com.example.resumegenerator.home.presentation.util.components.ExpandableCategory
-import com.example.resumegenerator.screens.Screens
-import java.net.URLEncoder
 
 @Composable
 fun HomeComposable(navController: NavHostController) {
@@ -44,10 +42,7 @@ fun HomeComposable(navController: NavHostController) {
                         expandedCategories[category.name] =
                             expandedCategories[category.name] != true
                     },
-                    onTemplateClick = { template ->
-                        val encodedPath = URLEncoder.encode(template.pdfAssetPath, "UTF-8")
-                        navController.navigate(Screens.Editor.createRoute(encodedPath))
-                    },
+
                     navController = navController
                 )
             }
