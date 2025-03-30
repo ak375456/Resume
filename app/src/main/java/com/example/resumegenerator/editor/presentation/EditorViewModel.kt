@@ -45,12 +45,20 @@ class EditorViewModel @Inject constructor(
         }
     }
     fun updateFieldValue(fieldName: String, value: String) {
+        val manipulatedValue = when (fieldName) {
+            "NameField" -> value.uppercase()  // Capitalize the entire name
+            "DesiredRole" -> value.lowercase() // Convert emails to lowercase
+            "phone" -> value.filter { it.isDigit() } // Remove non-numeric characters
+            else -> value
+        }
+
         _uiState.value = _uiState.value.copy(
             fields = _uiState.value.fields.toMutableMap().apply {
-                put(fieldName, value)
+                put(fieldName, manipulatedValue)
             }
         )
     }
+
 
     fun generatePdf() {
         viewModelScope.launch {
@@ -69,4 +77,5 @@ class EditorViewModel @Inject constructor(
             }
         }
     }
+
 }
