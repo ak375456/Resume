@@ -31,20 +31,20 @@ fun FullScreenPreview(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Scaffold(
-            modifier = Modifier.fillMaxSize()
-        ) { innerPadding ->
+        Surface (
+            modifier = Modifier
+                .fillMaxSize()
+        ){
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.Top
             ) {
                 // Header with title and close button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp), // Add padding to the header
+                        .padding(horizontal = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -52,7 +52,6 @@ fun FullScreenPreview(
                         text = template.name,
                         style = MaterialTheme.typography.headlineSmall
                     )
-
                     IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -60,10 +59,6 @@ fun FullScreenPreview(
                         )
                     }
                 }
-
-                Spacer(modifier = Modifier.height(8.dp)) // Add spacing after the header
-
-                // Zoomable Image
                 ZoomableImage(
                     imageRes = template.thumbnailRes,
                     modifier = Modifier
@@ -71,19 +66,15 @@ fun FullScreenPreview(
                         .weight(1f),
                     resetTrigger = resetCounter > 0
                 )
-
-                Spacer(modifier = Modifier.height(16.dp)) // Add spacing before the button
-
-                // Reset Zoom Button
                 Button(
                     onClick = { resetCounter++ },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text("Reset Zoom")
                 }
-
-                Spacer(modifier = Modifier.height(36.dp)) // Add spacing at the bottom
+                Spacer(modifier = Modifier.height(36.dp))
             }
         }
-    }
+        }
+
 }
