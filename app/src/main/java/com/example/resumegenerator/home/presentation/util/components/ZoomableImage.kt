@@ -19,7 +19,7 @@ fun ZoomableImage(
     contentScale: ContentScale = ContentScale.Fit,
     resetTrigger: Boolean = false // Changed from onReset callback
 ) {
-    var scale by remember { mutableStateOf(1f) }
+    var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
 
     // Reset when resetTrigger changes

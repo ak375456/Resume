@@ -31,18 +31,20 @@ fun FullScreenPreview(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
+        Scaffold(
+            modifier = Modifier.fillMaxSize()
+        ) { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(innerPadding),
+                verticalArrangement = Arrangement.Top
             ) {
                 // Header with title and close button
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp), // Add padding to the header
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -59,8 +61,9 @@ fun FullScreenPreview(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp)) // Add spacing after the header
 
+                // Zoomable Image
                 ZoomableImage(
                     imageRes = template.thumbnailRes,
                     modifier = Modifier
@@ -69,12 +72,17 @@ fun FullScreenPreview(
                     resetTrigger = resetCounter > 0
                 )
 
+                Spacer(modifier = Modifier.height(16.dp)) // Add spacing before the button
+
+                // Reset Zoom Button
                 Button(
                     onClick = { resetCounter++ },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
                     Text("Reset Zoom")
                 }
+
+                Spacer(modifier = Modifier.height(36.dp)) // Add spacing at the bottom
             }
         }
     }
