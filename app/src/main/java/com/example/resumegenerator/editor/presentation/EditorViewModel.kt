@@ -1,8 +1,7 @@
 package com.example.resumegenerator.editor.presentation
 
-
-
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.resumegenerator.editor.data.repository.PdfRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -11,12 +10,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
-// presentation/EditorViewModel.kt
 @HiltViewModel
 class EditorViewModel @Inject constructor(
-    private val pdfRepository: PdfRepository
-) : ViewModel() {
+    private val pdfRepository: PdfRepository,
+    application: Application
+) : AndroidViewModel(application) {
 
     private var _templatePath: String = ""
     private val _uiState = MutableStateFlow(EditorState())
@@ -44,11 +42,12 @@ class EditorViewModel @Inject constructor(
             }
         }
     }
+
     fun updateFieldValue(fieldName: String, value: String) {
         val manipulatedValue = when (fieldName) {
-            "NameField" -> value.uppercase()  // Capitalize the entire name
-            "DesiredRole" -> value.lowercase() // Convert emails to lowercase
-            "phone" -> value.filter { it.isDigit() } // Remove non-numeric characters
+            "NameField" -> value.uppercase()
+            "DesiredRole" -> value.lowercase()
+            "phone" -> value.filter { it.isDigit() }
             else -> value
         }
 
@@ -58,7 +57,6 @@ class EditorViewModel @Inject constructor(
             }
         )
     }
-
 
     fun generatePdf() {
         viewModelScope.launch {
@@ -77,5 +75,4 @@ class EditorViewModel @Inject constructor(
             }
         }
     }
-
 }
