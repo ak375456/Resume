@@ -29,6 +29,7 @@ fun SetupNavGraph(navController: NavHostController) {
             val templatePath = URLDecoder.decode(encodedPath, "UTF-8")
             EditorScreen(
                 templatePath = templatePath,
+                navController = navController,
                 onBack = { navController.popBackStack() }
             )
         }

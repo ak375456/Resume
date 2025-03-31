@@ -17,22 +17,27 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 
 @Composable
 fun EditorScreen(
     templatePath: String,
     viewModel: EditorViewModel = hiltViewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    navController: NavHostController
 ) {
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(templatePath) {
         viewModel.setTemplatePath(templatePath)
     }
 
-    val uiState by viewModel.uiState.collectAsState()
-
-    if (uiState.isSuccess) {
-        LaunchedEffect(Unit) {
+    LaunchedEffect(uiState.isSuccess) {
+        if (uiState.isSuccess) {
+            // Store the path in navigation backstack before going back
+            navController.previousBackStackEntry
+                ?.savedStateHandle
+                ?.set("generatedPdfPath", uiState.generatedPdfPath)
             onBack()
         }
     }

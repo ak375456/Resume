@@ -62,10 +62,11 @@ class EditorViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isGenerating = true)
-                pdfRepository.generatePdf(_templatePath, _uiState.value.fields)
+                val generatedFile = pdfRepository.generatePdf(_templatePath, _uiState.value.fields)
                 _uiState.value = _uiState.value.copy(
                     isGenerating = false,
-                    isSuccess = true
+                    isSuccess = true,
+                    generatedPdfPath = generatedFile?.absolutePath ?: ""
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
