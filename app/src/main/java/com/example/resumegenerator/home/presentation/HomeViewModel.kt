@@ -3,7 +3,6 @@ package com.example.resumegenerator.home.presentation
 
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
-import com.example.resumegenerator.editor.data.repository.PdfRepository
 import com.example.resumegenerator.home.presentation.util.models.Template
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
