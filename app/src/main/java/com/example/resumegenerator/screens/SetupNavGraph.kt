@@ -30,7 +30,6 @@ fun SetupNavGraph(navController: NavHostController) {
             EditorScreen(
                 templatePath = templatePath,
                 navController = navController,
-                onBack = { navController.popBackStack() }
             )
         }
     }

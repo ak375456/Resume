@@ -7,5 +7,6 @@ data class EditorState(
     val isGenerating: Boolean = false,
     val isSuccess: Boolean = false,
     val error: String? = null,
-    val generatedPdfPath: String? = null
+    val generatedPdfPath: String? = null,
+    val showSuccessSnackbar: Boolean = false // Add this
 )

@@ -12,6 +12,9 @@ import java.io.File
 import javax.inject.Inject
 import com.example.resumegenerator.R
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class PdfRepository @Inject constructor(
     @ApplicationContext private val context: Context
@@ -31,25 +34,29 @@ class PdfRepository @Inject constructor(
     }
 
     fun generatePdf(templatePath: String, fields: Map<String, String>): File? {
-        try {
+        return try {
+            // Create app-specific directory in Documents
             val documentsDir = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
-                context.getString(R.string.app_name) // Use context
-            )
-
-            if (!documentsDir.exists()) {
-                documentsDir.mkdirs()
+                context.getString(R.string.app_name)
+            ).apply {
+                if (!exists()) mkdirs()
             }
 
-            val outputFile = File(documentsDir, "CV_${System.currentTimeMillis()}.pdf")
+            // Generate timestamped filename
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                .format(Date())
+            val outputFile = File(documentsDir, "CV_$timestamp.pdf")
 
+            // Generate PDF
             context.assets.open(templatePath).use { inputStream ->
                 PdfReader(inputStream).use { reader ->
                     PdfWriter(outputFile).use { writer ->
                         PdfDocument(reader, writer).use { pdfDoc ->
-                            val form = PdfAcroForm.getAcroForm(pdfDoc, true)
-                            fields.forEach { (fieldName, value) ->
-                                form?.getField(fieldName)?.setValue(value)
+                            PdfAcroForm.getAcroForm(pdfDoc, true)?.let { form ->
+                                fields.forEach { (fieldName, value) ->
+                                    form.getField(fieldName)?.setValue(value)
+                                }
                             }
                             pdfDoc.close()
                         }
@@ -57,11 +64,13 @@ class PdfRepository @Inject constructor(
                 }
             }
 
-            Log.d("PDF_GENERATION", "PDF saved at: ${outputFile.absolutePath}")
-            return outputFile
+            // Return simplified path info
+            outputFile.apply {
+                Log.d("PDF_SAVED", "Saved to: ${absolutePath}")
+            }
         } catch (e: Exception) {
-            Log.e("PDF_ERROR", "Failed to generate PDF", e)
-            return null
+            Log.e("PDF_ERROR", "Generation failed", e)
+            null
         }
     }
 }

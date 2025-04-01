@@ -66,7 +66,8 @@ class EditorViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     isGenerating = false,
                     isSuccess = true,
-                    generatedPdfPath = generatedFile?.absolutePath ?: ""
+                    generatedPdfPath = generatedFile?.absolutePath ?: "",
+                    showSuccessSnackbar = true
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -75,5 +76,10 @@ class EditorViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    // Add this function to dismiss the snackbar
+    fun dismissSnackbar() {
+        _uiState.value = _uiState.value.copy(showSuccessSnackbar = false)
     }
 }
