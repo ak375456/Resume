@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,6 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Plus
 import com.example.resumegenerator.home.presentation.util.models.Template
 import com.example.resumegenerator.home.presentation.util.models.TemplateCategory
 import kotlin.collections.chunked
@@ -41,11 +44,22 @@ fun ExpandableCategory(
                 .padding(8.dp),
             shape = RoundedCornerShape(8.dp),
         ) {
-            Text(
-                text = category.name,
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp)
-            )
+            Row (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+
+            ){
+                Text(
+                    text = category.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(16.dp)
+                )
+                Icon(
+                    Lucide.Plus,
+                    "plus"
+                )
+            }
         }
 
         AnimatedVisibility(visible = isExpanded) {

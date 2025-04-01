@@ -55,7 +55,6 @@ fun HomeComposable(navController: NavHostController) {
         snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         val expandedCategories = remember { mutableStateMapOf<String, Boolean>() }
-
         LazyColumn(
             modifier = Modifier
                 .padding(paddingValues)
@@ -69,7 +68,6 @@ fun HomeComposable(navController: NavHostController) {
                         expandedCategories[category.name] =
                             expandedCategories[category.name] != true
                     },
-
                     navController = navController
                 )
             }
