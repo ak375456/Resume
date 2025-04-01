@@ -17,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -31,11 +32,11 @@ import kotlin.collections.forEach
 fun ExpandableCategory(
     category: TemplateCategory,
     isExpanded: Boolean,
+    selectedTemplate: Template?,
     onCategoryClick: () -> Unit,
+    onTemplateSelected: (Template) -> Unit,
     navController: NavHostController,
 ) {
-    var selectedTemplate by remember { mutableStateOf<Template?>(null) }
-
     Column(modifier = Modifier.fillMaxWidth()) {
         Surface(
             onClick = onCategoryClick,
@@ -44,21 +45,17 @@ fun ExpandableCategory(
                 .padding(8.dp),
             shape = RoundedCornerShape(8.dp),
         ) {
-            Row (
+            Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-
+                verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
                     text = category.name,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(16.dp)
                 )
-                Icon(
-                    Lucide.Plus,
-                    "plus"
-                )
+                Icon(Lucide.Plus, "plus")
             }
         }
 
@@ -72,16 +69,12 @@ fun ExpandableCategory(
                         rowTemplates.forEach { template ->
                             TemplateCard(
                                 template = template,
-                                isSelected = selectedTemplate == template, // Check if this template is selected
+                                isSelected = selectedTemplate == template,
                                 modifier = Modifier.weight(1f),
-                                onOptionSelected = {
-                                    selectedTemplate = if (selectedTemplate == it) null else it
-                                },
+                                onOptionSelected = { onTemplateSelected(template) },
                                 navController = navController
                             )
                         }
-
-                        // Fill remaining space for uneven rows
                         if (rowTemplates.size % 2 != 0) {
                             Spacer(Modifier.weight(1f))
                         }
