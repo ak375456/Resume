@@ -1,6 +1,7 @@
 // home/presentation/HomeViewModel.kt
 package com.example.resumegenerator.home.presentation
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.ViewModel
@@ -31,8 +32,8 @@ class HomeViewModel @Inject constructor(
     private val _favoriteTemplates = MutableStateFlow<List<Template>>(emptyList())
     val favoriteTemplates: StateFlow<List<Template>> = _favoriteTemplates.asStateFlow()
 
-    private val _allTemplates = mutableStateListOf<TemplateCategory>()
-    val allTemplates: List<TemplateCategory> get() = _allTemplates
+    private val _allTemplates = MutableStateFlow<List<TemplateCategory>>(emptyList())
+    val allTemplates: StateFlow<List<TemplateCategory>> = _allTemplates.asStateFlow()
 
     fun toggleCategory(categoryName: String) {
         _expandedCategories[categoryName] = _expandedCategories[categoryName] != true
@@ -53,18 +54,29 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setTemplates(templates: List<TemplateCategory>) {
-        _allTemplates.clear()
-        _allTemplates.addAll(templates)
+        _allTemplates.value = templates
     }
 
     fun toggleFavorite(template: Template) {
         viewModelScope.launch {
-            if (template.isFavorite) {
-                favoriteRepository.removeFavorite(template)
-            } else {
-                favoriteRepository.addFavorite(template)
+            try {
+                val updatedTemplate = template.copy(isFavorite = !template.isFavorite)
+
+                if (updatedTemplate.isFavorite) {
+                    favoriteRepository.addFavorite(updatedTemplate)
+                } else {
+                    favoriteRepository.removeFavorite(updatedTemplate)
+                }
+
+                loadFavorites()
+                _allTemplates.value = _allTemplates.value.map { category ->
+                    category.copy(templates = category.templates.map {
+                        if (it.id == template.id) updatedTemplate else it
+                    })
+                }
+            } catch (e: Exception) {
+                Log.e("HomeVM", "Error toggling favorite", e)
             }
-            loadFavorites()
         }
     }
 

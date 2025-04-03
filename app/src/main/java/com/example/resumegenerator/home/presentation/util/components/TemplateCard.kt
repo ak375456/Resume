@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -124,9 +124,9 @@ fun TemplateCard(
                 modifier = Modifier.align(Alignment.TopEnd)
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Star,
-                    contentDescription = "Favorite",
-                    tint = if (template.isFavorite) Color.Green else Color.Black
+                    imageVector = if (template.isFavorite) Icons.Default.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = if (template.isFavorite) "Remove from favorites" else "Add to favorites",
+                    tint = if (template.isFavorite) Color(0xffC51104) else Color.Black
                 )
             }
         }

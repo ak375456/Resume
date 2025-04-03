@@ -33,7 +33,11 @@ fun HomeComposable(
     val favoriteTemplates by viewModel.favoriteTemplates.collectAsState()
 
     LaunchedEffect(templates) {
-        viewModel.setTemplates(templates)
+        viewModel.setTemplates(templates.map { category ->
+            category.copy(templates = category.templates.map { template ->
+                template.copy(isFavorite = favoriteTemplates.any { it.id == template.id })
+            })
+        })
     }
 
     val allCategories = remember(templates, favoriteTemplates) {
