@@ -8,6 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,6 +19,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.resumegenerator.home.presentation.util.components.DynamicTemplateRepository
 import com.example.resumegenerator.home.presentation.util.components.ExpandableCategory
+import com.example.resumegenerator.home.presentation.util.models.TemplateCategory
 
 @Composable
 fun HomeComposable(
@@ -27,6 +30,22 @@ fun HomeComposable(
     val templates by remember {
         mutableStateOf(DynamicTemplateRepository(context).getTemplates())
     }
+    val favoriteTemplates by viewModel.favoriteTemplates.collectAsState()
+
+    LaunchedEffect(templates) {
+        viewModel.setTemplates(templates)
+    }
+
+    val allCategories = remember(templates, favoriteTemplates) {
+        val favoritesCategory = if (favoriteTemplates.isNotEmpty()) {
+            TemplateCategory(
+                name = "Favorites",
+                templates = favoriteTemplates
+            )
+        } else null
+
+        listOfNotNull(favoritesCategory) + templates
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -36,7 +55,7 @@ fun HomeComposable(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            items(templates) { category ->
+            items(allCategories) { category ->
                 ExpandableCategory(
                     category = category,
                     isExpanded = viewModel.expandedCategories[category.name] == true,
@@ -44,6 +63,9 @@ fun HomeComposable(
                     onCategoryClick = { viewModel.toggleCategory(category.name) },
                     onTemplateSelected = { template ->
                         viewModel.selectTemplate(category.name, template)
+                    },
+                    onFavoriteClick = { template ->
+                        viewModel.toggleFavorite(template)
                     },
                     navController = navController
                 )

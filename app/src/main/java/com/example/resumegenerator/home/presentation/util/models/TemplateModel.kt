@@ -4,5 +4,6 @@ data class Template(
     val id: Int,
     val name: String,
     val thumbnailRes: Int,
-    val pdfAssetPath: String
+    val pdfAssetPath: String,
+    var isFavorite: Boolean = false
 )
