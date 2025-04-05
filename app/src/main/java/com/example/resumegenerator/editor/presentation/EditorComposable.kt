@@ -1,5 +1,7 @@
 package com.example.resumegenerator.editor.presentation
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,13 +25,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.resumegenerator.components.SuccessSnackbar
 import com.example.resumegenerator.components.SuccessSnackbarVisuals
 import com.example.resumegenerator.ui.theme.CVAppColors
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun EditorScreen(
@@ -41,6 +47,8 @@ fun EditorScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current // Get the context
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(templatePath) {
         viewModel.setTemplatePath(templatePath)
@@ -48,6 +56,7 @@ fun EditorScreen(
 
     LaunchedEffect(uiState.showSuccessSnackbar) {
         if (uiState.showSuccessSnackbar && uiState.generatedPdfPath != null) {
+            focusManager.clearFocus()
             scope.launch {
                 val visuals = SuccessSnackbarVisuals(
                     pdfPath = uiState.generatedPdfPath!!,
@@ -66,7 +75,12 @@ fun EditorScreen(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState) { data ->
                 if (data.visuals is SuccessSnackbarVisuals) {
-                    SuccessSnackbar(visuals = data.visuals as SuccessSnackbarVisuals)
+                    SuccessSnackbar(
+                        visuals = data.visuals as SuccessSnackbarVisuals,
+                        onActionPerformed = { successVisuals ->
+                            openPdf(context, successVisuals.pdfFile)
+                        }
+                    )
                 } else {
                     Snackbar(
                         containerColor = if (isDarkTheme) CVAppColors.Components.Error.backgroundDark
@@ -183,5 +197,22 @@ private fun EditorContent(
                 Text("Generate PDF")
             }
         }
+    }
+}
+
+fun openPdf(context: Context, pdfFile: File) {
+    try {
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider", // Replace with your actual FileProvider authority
+            pdfFile
+        )
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.setDataAndType(uri, "application/pdf")
+        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        // Handle the error, e.g., show a toast message
     }
 }

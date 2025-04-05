@@ -64,9 +64,11 @@ fun ExpandableCategory(
                 )
                 Icon(
                     Lucide.Plus,
+
                     "plus",
                     tint = if (isDarkTheme) CVAppColors.Components.Icons.primaryDark
-                    else CVAppColors.Components.Icons.primaryLight
+                    else CVAppColors.Components.Icons.primaryLight,
+                    modifier = Modifier.padding(end = 16.dp),
                 )
             }
         }
