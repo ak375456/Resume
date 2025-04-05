@@ -11,26 +11,36 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+private val LightColorScheme = lightColorScheme(
+    primary = CVAppColors.Light.primary,
+    onPrimary = CVAppColors.Light.onPrimary,
+    primaryContainer = CVAppColors.Light.primaryVariant,
+    secondary = CVAppColors.Light.secondary,
+    onSecondary = CVAppColors.Light.onSecondary,
+    secondaryContainer = CVAppColors.Light.secondaryVariant,
+    background = CVAppColors.Light.background,
+    onBackground = CVAppColors.Light.onBackground,
+    surface = CVAppColors.Light.surface,
+    onSurface = CVAppColors.Light.onSurface,
+    error = CVAppColors.Light.error,
+    onError = CVAppColors.Light.onError,
+    outline = CVAppColors.Light.divider
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val DarkColorScheme = darkColorScheme(
+    primary = CVAppColors.Dark.primary,
+    onPrimary = CVAppColors.Dark.onPrimary,
+    primaryContainer = CVAppColors.Dark.primaryVariant,
+    secondary = CVAppColors.Dark.secondary,
+    onSecondary = CVAppColors.Dark.onSecondary,
+    secondaryContainer = CVAppColors.Dark.secondaryVariant,
+    background = CVAppColors.Dark.background,
+    onBackground = CVAppColors.Dark.onBackground,
+    surface = CVAppColors.Dark.surface,
+    onSurface = CVAppColors.Dark.onSurface,
+    error = CVAppColors.Dark.error,
+    onError = CVAppColors.Dark.onError,
+    outline = CVAppColors.Dark.divider
 )
 
 @Composable
@@ -43,7 +53,7 @@ fun ResumeGeneratorTheme(
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkTheme) DarkColorScheme else LightColorScheme
         }
 
         darkTheme -> DarkColorScheme
