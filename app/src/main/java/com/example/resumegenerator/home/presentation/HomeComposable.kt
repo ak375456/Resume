@@ -2,6 +2,7 @@ package com.example.resumegenerator.home.presentation
 
 
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import androidx.navigation.NavHostController
 import com.example.resumegenerator.home.presentation.util.components.DynamicTemplateRepository
 import com.example.resumegenerator.home.presentation.util.components.ExpandableCategory
 import com.example.resumegenerator.home.presentation.util.models.TemplateCategory
+import com.example.resumegenerator.ui.theme.CVAppColors
 
 @Composable
 fun HomeComposable(
@@ -27,6 +29,7 @@ fun HomeComposable(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
     val templates by remember {
         mutableStateOf(DynamicTemplateRepository(context).getTemplates())
     }
@@ -53,27 +56,30 @@ fun HomeComposable(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        containerColor = if (isDarkTheme) CVAppColors.Dark.background
+        else CVAppColors.Light.background
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            items(allCategories) { category ->
-                ExpandableCategory(
-                    category = category,
-                    isExpanded = viewModel.expandedCategories[category.name] == true,
-                    selectedTemplate = viewModel.selectedTemplates[category.name],
-                    onCategoryClick = { viewModel.toggleCategory(category.name) },
-                    onTemplateSelected = { template ->
-                        viewModel.selectTemplate(category.name, template)
-                    },
-                    onFavoriteClick = { template ->
-                        viewModel.toggleFavorite(template)
-                    },
-                    navController = navController
-                )
+                .fillMaxSize(),
+            content = {
+                items(allCategories) { category ->
+                    ExpandableCategory(
+                        category = category,
+                        isExpanded = viewModel.expandedCategories[category.name] == true,
+                        selectedTemplate = viewModel.selectedTemplates[category.name],
+                        onCategoryClick = { viewModel.toggleCategory(category.name) },
+                        onTemplateSelected = { template ->
+                            viewModel.selectTemplate(category.name, template)
+                        },
+                        onFavoriteClick = { template ->
+                            viewModel.toggleFavorite(template)
+                        },
+                        navController = navController
+                    )
+                }
             }
-        }
+        )
     }
 }

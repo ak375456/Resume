@@ -1,6 +1,7 @@
 package com.example.resumegenerator.home.presentation.util.components
 
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,12 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.resumegenerator.home.presentation.util.models.Template
+import com.example.resumegenerator.ui.theme.CVAppColors
 
 @Composable
 fun FullScreenPreview(
     template: Template,
     onDismiss: () -> Unit
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
     var resetCounter by remember { mutableIntStateOf(0) }
 
     Dialog(
@@ -32,32 +35,47 @@ fun FullScreenPreview(
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            color = if (isDarkTheme) CVAppColors.Dark.background
+            else CVAppColors.Light.background
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top
             ) {
                 // Header with title and close button
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Surface(
+                    color = if (isDarkTheme) CVAppColors.Components.TopBar.backgroundDark
+                    else CVAppColors.Components.TopBar.backgroundLight,
+                    tonalElevation = 2.dp
                 ) {
-                    Text(
-                        text = template.name,
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                    IconButton(onClick = onDismiss) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close preview"
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = template.name,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = if (isDarkTheme) CVAppColors.Components.Text.h1Dark
+                            else CVAppColors.Components.Text.h1Light
                         )
+                        IconButton(
+                            onClick = onDismiss,
+                            colors = IconButtonDefaults.iconButtonColors(
+                                contentColor = if (isDarkTheme) CVAppColors.Components.Icons.primaryDark
+                                else CVAppColors.Components.Icons.primaryLight
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close preview"
+                            )
+                        }
                     }
                 }
-
 
                 ZoomableImage(
                     imageRes = template.thumbnailRes,
@@ -67,15 +85,22 @@ fun FullScreenPreview(
                     resetTrigger = resetCounter
                 )
 
-
                 Button(
                     onClick = { resetCounter++ },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isDarkTheme) CVAppColors.Components.Buttons.primaryBackgroundDark
+                        else CVAppColors.Components.Buttons.primaryBackgroundLight,
+                        contentColor = if (isDarkTheme) CVAppColors.Components.Buttons.primaryContentDark
+                        else CVAppColors.Components.Buttons.primaryContentLight
+                    )
                 ) {
                     Text("Reset Zoom")
                 }
 
-                Spacer(modifier = Modifier.height(36.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }
