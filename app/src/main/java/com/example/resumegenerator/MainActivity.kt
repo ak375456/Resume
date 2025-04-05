@@ -9,7 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.resumegenerator.screens.SetupNavGraph
 import com.example.resumegenerator.ui.theme.ResumeGeneratorTheme
 import dagger.hilt.android.AndroidEntryPoint
-
+//test
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
