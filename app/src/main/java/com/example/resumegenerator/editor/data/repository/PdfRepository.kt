@@ -19,19 +19,6 @@ import java.util.Locale
 class PdfRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    fun detectFields(templatePath: String): Map<String, String> {
-        return try {
-            context.assets.open(templatePath).use { input ->
-                PdfReader(input).use { reader ->
-                    val form = PdfAcroForm.getAcroForm(PdfDocument(reader), false)
-                    form?.formFields?.mapValues { it.value.toString() } ?: emptyMap()
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("PDF_FIELDS", "Error detecting fields", e)
-            emptyMap()
-        }
-    }
 
     fun generatePdf(templatePath: String, fields: Map<String, String>): File? {
         return try {
@@ -47,7 +34,7 @@ class PdfRepository @Inject constructor(
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                 .format(Date())
             val outputFile = File(documentsDir, "CV_$timestamp.pdf")
-
+            Log.d("PDF_REPO", "Received fields: $fields")
             // Generate PDF
             context.assets.open(templatePath).use { inputStream ->
                 PdfReader(inputStream).use { reader ->

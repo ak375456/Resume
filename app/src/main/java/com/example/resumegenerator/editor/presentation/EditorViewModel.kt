@@ -1,8 +1,10 @@
 package com.example.resumegenerator.editor.presentation
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import coil.util.Logger
 import com.example.resumegenerator.editor.data.repository.PdfRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,39 +24,71 @@ class EditorViewModel @Inject constructor(
 
     fun setTemplatePath(path: String) {
         _templatePath = path
-        loadTemplateFields()
-    }
-
-    private fun loadTemplateFields() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-            try {
-                val fields = pdfRepository.detectFields(_templatePath)
-                _uiState.value = _uiState.value.copy(
-                    fields = fields.keys.associateWith { "" },
-                    isLoading = false
-                )
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    error = "Failed to load template",
-                    isLoading = false
-                )
-            }
-        }
-    }
-
-    fun updateFieldValue(fieldName: String, value: String) {
-        val manipulatedValue = when (fieldName) {
-            "NameField" -> value.uppercase()
-            "DesiredRole" -> value.lowercase()
-            "phone" -> value.filter { it.isDigit() }
-            else -> value
-        }
-
         _uiState.value = _uiState.value.copy(
-            fields = _uiState.value.fields.toMutableMap().apply {
-                put(fieldName, manipulatedValue)
+            personalInfo = mapOf(
+                "nameField" to "",
+                "desiredRole" to "",
+                "numberField" to "",
+                "emailField" to "",
+                "linkedinField" to "",
+                "githubField" to ""
+            )
+        )
+    }
+
+
+
+    fun updatePersonalInfo(field: String, value: String) {
+        _uiState.value = _uiState.value.copy(
+            personalInfo = _uiState.value.personalInfo.toMutableMap().apply {
+                put(field, value)
             }
+        )
+    }
+
+    fun updateExperience(experience: Experience) {
+        _uiState.value = _uiState.value.copy(
+            experiences = _uiState.value.experiences.map {
+                if (it.id == experience.id) experience else it
+            }
+        )
+    }
+
+    fun addExperience() {
+        _uiState.value = _uiState.value.copy(
+            experiences = _uiState.value.experiences + Experience()
+        )
+    }
+
+    fun removeExperience(id: String) {
+        _uiState.value = _uiState.value.copy(
+            experiences = _uiState.value.experiences.filter { it.id != id }
+        )
+    }
+
+    fun updateEducation(education: Education) {
+        _uiState.value = _uiState.value.copy(
+            education = _uiState.value.education.map {
+                if (it.id == education.id) education else it
+            }
+        )
+    }
+
+    fun addEducation() {
+        _uiState.value = _uiState.value.copy(
+            education = _uiState.value.education + Education()
+        )
+    }
+
+    fun updateSkills(skills: List<String>) {
+        _uiState.value = _uiState.value.copy(
+            skills = skills
+        )
+    }
+
+    fun updateSummary(summary: String) {
+        _uiState.value = _uiState.value.copy(
+            summary = summary
         )
     }
 
@@ -62,10 +96,22 @@ class EditorViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isGenerating = true)
-                val generatedFile = pdfRepository.generatePdf(_templatePath, _uiState.value.fields)
+
+                // Build the fields map correctly
+                val fields = mapOf(
+                    "nameField" to (_uiState.value.personalInfo["nameField"] ?: ""),
+                    "desiredRole" to (_uiState.value.personalInfo["desiredRole"] ?: ""),
+                    "numberField" to (_uiState.value.personalInfo["numberField"] ?: ""),
+                    "emailField" to (_uiState.value.personalInfo["emailField"] ?: ""),
+                    "linkedinField" to (_uiState.value.personalInfo["linkedinField"] ?: ""),
+                    "githubField" to (_uiState.value.personalInfo["githubField"] ?: ""),
+                )
+
+                Log.d("PDF_DEBUG", "Fields being sent: $fields")
+
+                val generatedFile = pdfRepository.generatePdf(_templatePath, fields)
                 _uiState.value = _uiState.value.copy(
                     isGenerating = false,
-                    isSuccess = true,
                     generatedPdfPath = generatedFile?.absolutePath ?: "",
                     showSuccessSnackbar = true
                 )
@@ -74,11 +120,11 @@ class EditorViewModel @Inject constructor(
                     isGenerating = false,
                     error = "Failed to generate PDF: ${e.message}"
                 )
+                Log.e("PDF_ERROR", "Generation failed", e)
             }
         }
     }
 
-    // Add this function to dismiss the snackbar
     fun dismissSnackbar() {
         _uiState.value = _uiState.value.copy(showSuccessSnackbar = false)
     }
