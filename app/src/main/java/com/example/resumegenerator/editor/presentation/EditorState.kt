@@ -17,6 +17,14 @@ data class EditorState(
     val showSuccessSnackbar: Boolean = false
 )
 
+
+data class Education(
+    val id: String = UUID.randomUUID().toString(),
+    val degree: String = "",
+    val institution: String = "",
+    val startDateAndEndData: String = "",
+)
+
 data class Experience(
     val id: String = UUID.randomUUID().toString(),
     val jobTitle: String = "",
@@ -24,13 +32,5 @@ data class Experience(
     val startDate: String = "",
     val endDate: String = "",
     val description: String = ""
-)
-
-data class Education(
-    val id: String = UUID.randomUUID().toString(),
-    val degree: String = "",
-    val institution: String = "",
-    val startDate: String = "",
-    val endDate: String = ""
 )
 

@@ -91,24 +91,32 @@ class EditorViewModel @Inject constructor(
             summary = summary
         )
     }
+    fun removeEducation(id: String) {
+        _uiState.value = _uiState.value.copy(
+            education = _uiState.value.education.filter { it.id != id }
+        )
+    }
+
 
     fun generatePdf() {
         viewModelScope.launch {
             try {
                 _uiState.value = _uiState.value.copy(isGenerating = true)
 
-                // Build the fields map correctly
-                val fields = mapOf(
-                    "nameField" to (_uiState.value.personalInfo["nameField"] ?: ""),
-                    "desiredRole" to (_uiState.value.personalInfo["desiredRole"] ?: ""),
-                    "numberField" to (_uiState.value.personalInfo["numberField"] ?: ""),
-                    "emailField" to (_uiState.value.personalInfo["emailField"] ?: ""),
-                    "linkedinField" to (_uiState.value.personalInfo["linkedinField"] ?: ""),
-                    "githubField" to (_uiState.value.personalInfo["githubField"] ?: ""),
-                )
+                // Build the fields map with education data
+                val fields = buildMap {
+                    // Personal info
+                    putAll(_uiState.value.personalInfo)
+
+                    // Education entries
+                    _uiState.value.education.forEachIndexed { index, education ->
+                        put("education_${index}_degree", education.degree)
+                        put("education_${index}_institution", education.institution)
+                        put("education_${index}_start_and_end", education.startDateAndEndData)
+                    }
+                }
 
                 Log.d("PDF_DEBUG", "Fields being sent: $fields")
-
                 val generatedFile = pdfRepository.generatePdf(_templatePath, fields)
                 _uiState.value = _uiState.value.copy(
                     isGenerating = false,

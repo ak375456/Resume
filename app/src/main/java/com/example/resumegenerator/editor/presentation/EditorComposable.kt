@@ -6,15 +6,22 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
@@ -38,9 +45,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Trash
 import com.example.resumegenerator.components.SuccessSnackbar
 import com.example.resumegenerator.components.SuccessSnackbarVisuals
+import com.example.resumegenerator.editor.presentation.components.PersonalInfoSection
+import com.example.resumegenerator.editor.presentation.components.SectionHeader
 import com.example.resumegenerator.ui.theme.CVAppColors
+import com.example.resumegenerator.ui.theme.CVAppColors.Components.Icons
 import com.example.util.textFieldColors
 import kotlinx.coroutines.launch
 import java.io.File
@@ -49,7 +61,7 @@ import java.io.File
 fun EditorScreen(
     templatePath: String,
     viewModel: EditorViewModel = hiltViewModel(),
-    navController: NavHostController
+    navController: NavHostController,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val uiState by viewModel.uiState.collectAsState()
@@ -128,7 +140,7 @@ private fun EditorContent(
     onAddExperience: () -> Unit,
     onAddEducation: () -> Unit,
     onGenerateClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val scrollState = rememberScrollState()
@@ -162,115 +174,114 @@ private fun EditorContent(
                 onValueChange = onPersonalInfoChange,
                 isDarkTheme = isDarkTheme
             )
-        }
-
-            Button(
-                onClick = onGenerateClick,
-                modifier = Modifier.padding(top = 16.dp),
-                enabled = !uiState.isGenerating,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isDarkTheme) CVAppColors.Components.Buttons.primaryBackgroundDark
-                    else CVAppColors.Components.Buttons.primaryBackgroundLight,
-                    contentColor = if (isDarkTheme) CVAppColors.Components.Buttons.primaryContentDark
-                    else CVAppColors.Components.Buttons.primaryContentLight,
-                    disabledContainerColor = if (isDarkTheme) CVAppColors.Components.Buttons.disabledBackgroundDark
-                    else CVAppColors.Components.Buttons.disabledBackgroundLight,
-                    disabledContentColor = if (isDarkTheme) CVAppColors.Components.Buttons.disabledContentDark
-                    else CVAppColors.Components.Buttons.disabledContentLight
+            // Education Section
+            SectionHeader(
+                title = "Education",
+                actionText = "Add Education",
+                onActionClick = onAddEducation
+            )
+            uiState.education.forEach { education ->
+                EducationItem(
+                    education = education,
+                    onValueChange = onEducationChange,
+                    isDarkTheme = isDarkTheme,
+                    onRemove = { /* Handle remove */ }
                 )
-            ) {
-                if (uiState.isGenerating) {
-                    CircularProgressIndicator(
-                        color = if (isDarkTheme) CVAppColors.Components.Buttons.primaryContentDark
-                        else CVAppColors.Components.Buttons.primaryContentLight,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                }
-                Text("Generate PDF")
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
+
+
+        Button(
+            onClick = onGenerateClick,
+            modifier = Modifier.padding(top = 16.dp),
+            enabled = !uiState.isGenerating,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isDarkTheme) CVAppColors.Components.Buttons.primaryBackgroundDark
+                else CVAppColors.Components.Buttons.primaryBackgroundLight,
+                contentColor = if (isDarkTheme) CVAppColors.Components.Buttons.primaryContentDark
+                else CVAppColors.Components.Buttons.primaryContentLight,
+                disabledContainerColor = if (isDarkTheme) CVAppColors.Components.Buttons.disabledBackgroundDark
+                else CVAppColors.Components.Buttons.disabledBackgroundLight,
+                disabledContentColor = if (isDarkTheme) CVAppColors.Components.Buttons.disabledContentDark
+                else CVAppColors.Components.Buttons.disabledContentLight
+            )
+        ) {
+            if (uiState.isGenerating) {
+                CircularProgressIndicator(
+                    color = if (isDarkTheme) CVAppColors.Components.Buttons.primaryContentDark
+                    else CVAppColors.Components.Buttons.primaryContentLight,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
+            Text("Generate PDF")
+        }
     }
+}
+
+
+
 
 @Composable
-private fun SectionHeader(
-    title: String,
-    actionText: String? = null,
-    onActionClick: (() -> Unit)? = null
+private fun EducationItem(
+    education: Education,
+    onValueChange: (Education) -> Unit,
+    isDarkTheme: Boolean,
+    onRemove: () -> Unit,
 ) {
-    Row(
+    Card(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDarkTheme) CVAppColors.Components.Cards.backgroundDark
+            else CVAppColors.Components.Cards.backgroundLight
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium
-        )
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextField(
+                    value = education.degree,
+                    onValueChange = { onValueChange(education.copy(degree = it)) },
+                    label = { Text("Degree") },
+                    modifier = Modifier.weight(1f),
+                    colors = textFieldColors(isDarkTheme)
+                )
 
-        actionText?.let {
-            TextButton(onClick = { onActionClick?.invoke() }) {
-                Text(text = actionText)
+                IconButton(onClick = onRemove) {
+                    Icon(Lucide.Trash, contentDescription = "Remove Education")
+                }
+            }
+
+            TextField(
+                value = education.institution,
+                onValueChange = { onValueChange(education.copy(institution = it)) },
+                label = { Text("Institution") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors(isDarkTheme)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TextField(
+                    value = education.startDateAndEndData,
+                    onValueChange = { onValueChange(education.copy(startDateAndEndData = it)) },
+                    label = { Text("Start Date And End Date (MMM YYYY)") },
+                    modifier = Modifier.weight(1f),
+                    colors = textFieldColors(isDarkTheme)
+                )
+
             }
         }
     }
 }
-@Composable
-private fun PersonalInfoSection(
-    personalInfo: Map<String, String>,
-    onValueChange: (String, String) -> Unit,
-    isDarkTheme: Boolean
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        TextField(
-            value = personalInfo["nameField"] ?: "",
-            onValueChange = { onValueChange("nameField", it) },
-            label = { Text("Full Name") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors(isDarkTheme)
-        )
-
-        TextField(
-            value = personalInfo["desiredRole"] ?: "",
-            onValueChange = { onValueChange("desiredRole", it) },
-            label = { Text("Desired Role") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors(isDarkTheme)
-        )
-        TextField(
-            value = personalInfo["numberField"] ?: "",
-            onValueChange = { onValueChange("numberField", it) },
-            label = { Text("Phone Number") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors(isDarkTheme)
-        )
-        TextField(
-            value = personalInfo["emailField"] ?: "",
-            onValueChange = { onValueChange("emailField", it) },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors(isDarkTheme)
-        )
-        TextField(
-            value = personalInfo["linkedinField"] ?: "",
-            onValueChange = { onValueChange("linkedinField", it) },
-            label = { Text("LinkedIn profile Link") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors(isDarkTheme)
-        )
-        TextField(
-            value = personalInfo["githubField"] ?: "",
-            onValueChange = { onValueChange("githubField", it) },
-            label = { Text("Portfolio (github/behance)") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = textFieldColors(isDarkTheme)
-        )
-
-        // Add more personal info fields as needed
-    }
-}
-
 
 fun openPdf(context: Context, pdfFile: File) {
     try {
