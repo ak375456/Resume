@@ -124,7 +124,8 @@ fun EditorScreen(
             onAddExperience = viewModel::addExperience,
             onAddEducation = viewModel::addEducation,
             onGenerateClick = viewModel::generatePdf,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(innerPadding),
+            viewModel = viewModel
         )
     }
 }
@@ -141,6 +142,7 @@ private fun EditorContent(
     onAddEducation: () -> Unit,
     onGenerateClick: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: EditorViewModel = hiltViewModel()
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val scrollState = rememberScrollState()
@@ -185,7 +187,8 @@ private fun EditorContent(
                     education = education,
                     onValueChange = onEducationChange,
                     isDarkTheme = isDarkTheme,
-                    onRemove = { /* Handle remove */ }
+                    onRemove = { viewModel.removeEducation(education.id) },
+                    viewModel = viewModel
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
@@ -228,6 +231,7 @@ private fun EducationItem(
     onValueChange: (Education) -> Unit,
     isDarkTheme: Boolean,
     onRemove: () -> Unit,
+    viewModel: EditorViewModel = hiltViewModel()
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),

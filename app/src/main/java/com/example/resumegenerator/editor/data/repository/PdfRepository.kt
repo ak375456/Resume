@@ -1,6 +1,6 @@
 package com.example.resumegenerator.editor.data.repository
 
-import android.app.Application
+
 import android.content.Context
 import android.os.Environment
 import android.util.Log
@@ -53,7 +53,7 @@ class PdfRepository @Inject constructor(
 
             // Return simplified path info
             outputFile.apply {
-                Log.d("PDF_SAVED", "Saved to: ${absolutePath}")
+                Log.d("PDF_SAVED", "Saved to: $absolutePath")
             }
         } catch (e: Exception) {
             Log.e("PDF_ERROR", "Generation failed", e)

@@ -5,8 +5,9 @@ import com.example.resumegenerator.R
 import com.example.resumegenerator.home.presentation.util.models.Template
 import com.example.resumegenerator.home.presentation.util.models.TemplateCategory
 import java.io.IOException
+import javax.inject.Inject
 
-class DynamicTemplateRepository(private val context: Context) {
+class DynamicTemplateRepository @Inject constructor(private val context: Context) {
 
     fun getTemplates(): List<TemplateCategory> {
         // Get all category directories in assets
@@ -66,5 +67,10 @@ class DynamicTemplateRepository(private val context: Context) {
                 null
             }
         } ?: R.drawable.default_preview
+    }
+    fun getTemplatePath(category: String, educationCount: Int): String {
+        val educationType = if (educationCount <= 1) "single_education" else "multiple_educations"
+        val templates = context.assets.list("$category/$educationType")?.filter { it.endsWith(".pdf") }
+        return "$category/$educationType/${templates?.firstOrNull() ?: "template1.pdf"}"
     }
 }

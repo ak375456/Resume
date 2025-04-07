@@ -6,6 +6,7 @@ import com.example.resumegenerator.editor.data.repository.PdfRepository
 import com.example.resumegenerator.home.data.local.db.AppDatabase
 import com.example.resumegenerator.home.data.local.db.dao.FavoriteTemplateDao
 import com.example.resumegenerator.home.data.repository.FavoriteTemplateRepository
+import com.example.resumegenerator.home.presentation.util.components.DynamicTemplateRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,5 +40,12 @@ object AppModule {
     @Provides
     fun providePdfRepository(@ApplicationContext context: Context): PdfRepository {
         return PdfRepository(context)
+    }
+
+    @Provides
+    fun provideDynamicTemplateRepository(
+        @ApplicationContext context: Context
+    ): DynamicTemplateRepository {
+        return DynamicTemplateRepository(context)
     }
 }
