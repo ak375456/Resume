@@ -93,6 +93,5 @@ dependencies {
     implementation ("com.itextpdf:itext7-core:7.1.16")
     implementation ("com.itextpdf:html2pdf:4.0.4")
 
-    implementation ("com.openhtmltopdf:openhtmltopdf-core:1.0.10")
-    implementation ("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
+
 }
