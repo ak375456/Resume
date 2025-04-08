@@ -5,7 +5,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.resumegenerator.editor.data.repository.HtmlTemplateRepository
 import com.example.resumegenerator.editor.data.repository.PdfGenerator
-
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -117,8 +116,8 @@ class EditorViewModel @Inject constructor(
         val template = templateRepo.getTemplate(_templateName)
 
         return template
-            .replace("{{name}}", _uiState.value.personalInfo["nameField"] ?: "")
-            .replace("{{role}}", _uiState.value.personalInfo["desiredRole"] ?: "")
+            .replace("{{NAME}}", _uiState.value.personalInfo["nameField"] ?: "")
+            .replace("{{Role}}", _uiState.value.personalInfo["desiredRole"] ?: "")
             .replace("{{phone}}", _uiState.value.personalInfo["numberField"] ?: "")
             .replace("{{email}}", _uiState.value.personalInfo["emailField"] ?: "")
             .replace("{{linkedin}}", _uiState.value.personalInfo["linkedinField"] ?: "")

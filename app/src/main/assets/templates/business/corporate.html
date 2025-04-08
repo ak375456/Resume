@@ -1,22 +1,26 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .name { font-size: 28px; font-weight: bold; margin-bottom: 5px; }
-        .contact { color: #555; margin-bottom: 20px; }
-    </style>
-</head>
+<html lang="en">
+<style>
+    body { font-family: Inter; margin: 20px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .name { font-size: 28px; font-weight: bold; margin-bottom: 2px; }
+    .role { font-size: 16px; margin-bottom: 5px; }
+    .contact { font-size: 9px; margin-bottom: 20px; }
+</style>
 <body>
 <div class="header">
-    <div class="name">{{name}}</div>
+
+    <div class="name">{{NAME}}</div>
+
+    <div class="role">{{Role}}</div>
+
     <div class="contact">
-        {{role}}<br>
-        {{phone}} | {{email}}<br>
-        LinkedIn: {{linkedin}}<br>
-        Portfolio: {{portfolio}}
+        {{phone}}
+        {{email}}
+        {{linkedin}}
+        {{portfolio}}
     </div>
+
 </div>
 
 <!-- Add other sections as needed -->
