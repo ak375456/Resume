@@ -2,8 +2,8 @@ package com.example.resumegenerator.di
 
 
 import android.content.Context
-import com.example.resumegenerator.editor.data.repository.HtmlPdfRepository
 import com.example.resumegenerator.editor.data.repository.HtmlTemplateRepository
+import com.example.resumegenerator.editor.data.repository.PdfGenerator
 import com.example.resumegenerator.home.data.local.db.AppDatabase
 import com.example.resumegenerator.home.data.local.db.dao.FavoriteTemplateDao
 import com.example.resumegenerator.home.data.repository.FavoriteTemplateRepository
@@ -38,21 +38,22 @@ object AppModule {
     }
 
 
+
+
+    @Provides
+    @Singleton
+    fun providePdfGenerator(
+        @ApplicationContext context: Context
+    ): PdfGenerator {
+        return PdfGenerator(context)
+    }
+
     @Provides
     @Singleton
     fun provideHtmlTemplateRepository(
         @ApplicationContext context: Context
     ): HtmlTemplateRepository {
         return HtmlTemplateRepository(context)
-    }
-
-    @Provides
-    @Singleton
-    fun provideHtmlPdfRepository(
-        @ApplicationContext context: Context,
-        templateRepo: HtmlTemplateRepository
-    ): HtmlPdfRepository {
-        return HtmlPdfRepository(context, templateRepo)
     }
 
     @Provides

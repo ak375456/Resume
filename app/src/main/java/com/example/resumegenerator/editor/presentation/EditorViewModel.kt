@@ -3,7 +3,9 @@ package com.example.resumegenerator.editor.presentation
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.resumegenerator.editor.data.repository.HtmlPdfRepository
+import com.example.resumegenerator.editor.data.repository.HtmlTemplateRepository
+import com.example.resumegenerator.editor.data.repository.PdfGenerator
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -12,7 +14,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditorViewModel @Inject constructor(
-    private val pdfRepository: HtmlPdfRepository,
+    private val pdfGenerator: PdfGenerator,
+    private val templateRepo: HtmlTemplateRepository,
     application: Application
 ) : AndroidViewModel(application) {
 
@@ -20,11 +23,10 @@ class EditorViewModel @Inject constructor(
     val uiState: StateFlow<EditorState> = _uiState
 
     private var _templateName: String = ""
+
     fun setTemplate(name: String) {
         _templateName = name
     }
-
-
 
     fun updatePersonalInfo(field: String, value: String) {
         _uiState.value = _uiState.value.copy(
@@ -91,23 +93,11 @@ class EditorViewModel @Inject constructor(
             try {
                 _uiState.value = _uiState.value.copy(isGenerating = true)
 
-                val data = buildMap {
-                    // Personal info
-                    put("name", _uiState.value.personalInfo["nameField"] ?: "")
-                    put("email", _uiState.value.personalInfo["emailField"] ?: "")
-                    put("phone", _uiState.value.personalInfo["numberField"] ?: "")
+                // Build HTML content dynamically
+                val htmlContent = buildHtmlContent()
 
-                    // Education
-                    _uiState.value.education.forEachIndexed { index, edu ->
-                        put("edu_${index}_degree", edu.degree)
-                        put("edu_${index}_institution", edu.institution)
-                        put("edu_${index}_dates", edu.startDateAndEndData)
-                    }
-
-                    // Add other sections as needed
-                }
-
-                val generatedFile = pdfRepository.generatePdf(_templateName, data)
+                // Generate PDF
+                val generatedFile = pdfGenerator.generatePdf(htmlContent)
 
                 _uiState.value = _uiState.value.copy(
                     isGenerating = false,
@@ -121,6 +111,18 @@ class EditorViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun buildHtmlContent(): String {
+        val template = templateRepo.getTemplate(_templateName)
+
+        return template
+            .replace("{{name}}", _uiState.value.personalInfo["nameField"] ?: "")
+            .replace("{{role}}", _uiState.value.personalInfo["desiredRole"] ?: "")
+            .replace("{{phone}}", _uiState.value.personalInfo["numberField"] ?: "")
+            .replace("{{email}}", _uiState.value.personalInfo["emailField"] ?: "")
+            .replace("{{linkedin}}", _uiState.value.personalInfo["linkedinField"] ?: "")
+            .replace("{{portfolio}}", _uiState.value.personalInfo["githubField"] ?: "")
     }
 
     fun dismissSnackbar() {

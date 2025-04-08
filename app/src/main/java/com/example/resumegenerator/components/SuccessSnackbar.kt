@@ -9,11 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.FileProvider
 import com.example.resumegenerator.ui.theme.CVAppColors
 import java.io.File
 

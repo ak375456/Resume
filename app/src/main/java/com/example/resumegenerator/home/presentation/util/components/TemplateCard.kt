@@ -40,7 +40,6 @@ import com.composables.icons.lucide.Plus
 import com.composables.icons.lucide.View
 import com.example.resumegenerator.home.presentation.util.models.Template
 import com.example.resumegenerator.screens.Screens
-import java.net.URLEncoder
 import com.example.resumegenerator.home.presentation.util.FileShareUtil
 import com.example.resumegenerator.ui.theme.CVAppColors
 
@@ -114,8 +113,7 @@ fun TemplateCard(
                         ) {
                             IconButton(
                                 onClick = {
-                                    val encodedName = URLEncoder.encode(template.templateName, "UTF-8")
-                                    navController.navigate(Screens.Editor.createRoute(encodedName))
+                                    navController.navigate(Screens.Editor.createRoute(template.templateName))
                                 },
                                 colors = IconButtonDefaults.iconButtonColors(
                                     containerColor = if (isDarkTheme) CVAppColors.Components.Buttons.primaryBackgroundDark

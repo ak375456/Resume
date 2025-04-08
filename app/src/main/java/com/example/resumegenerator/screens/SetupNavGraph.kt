@@ -24,12 +24,13 @@ fun SetupNavGraph(navController: NavHostController) {
         composable(
             route = Screens.Editor.route,
             arguments = listOf(navArgument("templateName") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val templateName = backStackEntry.arguments?.getString("templateName") ?: ""
-                EditorScreen(
-                    templateName = templateName,
-                    navController = navController,
-                )
+        ) { backStackEntry ->
+            val encodedName = backStackEntry.arguments?.getString("templateName") ?: ""
+            val templateName = URLDecoder.decode(encodedName, "UTF-8")
+            EditorScreen(
+                templateName = templateName,
+                navController = navController,
+            )
 
         }
     }
