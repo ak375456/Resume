@@ -42,19 +42,6 @@ android {
         compose = true
     }
 
-    packaging {
-        resources {
-            // Exclude duplicate license files
-            excludes += "META-INF/LICENSE-W3C-TEST"
-            excludes += "META-INF/LICENSE-LGPL-3.txt"   // Add this line
-            excludes += "META-INF/LICENSE-LGPL-2.1.txt"   // Add this line
-            excludes += "META-INF/DEPENDENCIES"  // Add this line
-            // You might also need these if they appear in future errors
-            excludes += "META-INF/LICENSE"
-            excludes += "META-INF/NOTICE"
-            excludes += "META-INF/*.kotlin_module"
-        }
-    }
 }
 
 dependencies {
@@ -108,5 +95,4 @@ dependencies {
 
     implementation ("com.openhtmltopdf:openhtmltopdf-core:1.0.10")
     implementation ("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
-    implementation ("com.github.barteksc:android-pdf-viewer:2.8.2")
 }
