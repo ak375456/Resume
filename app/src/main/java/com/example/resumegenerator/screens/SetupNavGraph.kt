@@ -23,14 +23,14 @@ fun SetupNavGraph(navController: NavHostController) {
         }
         composable(
             route = Screens.Editor.route,
-            arguments = listOf(navArgument("templatePath") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val encodedPath = backStackEntry.arguments?.getString("templatePath") ?: ""
-            val templatePath = URLDecoder.decode(encodedPath, "UTF-8")
-            EditorScreen(
-                templatePath = templatePath,
-                navController = navController,
-            )
+            arguments = listOf(navArgument("templateName") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val templateName = backStackEntry.arguments?.getString("templateName") ?: ""
+                EditorScreen(
+                    templateName = templateName,
+                    navController = navController,
+                )
+
         }
     }
 }

@@ -114,8 +114,8 @@ fun TemplateCard(
                         ) {
                             IconButton(
                                 onClick = {
-                                    val encodedPath = URLEncoder.encode(template.pdfAssetPath, "UTF-8")
-                                    navController.navigate(Screens.Editor.createRoute(encodedPath))
+                                    val encodedName = URLEncoder.encode(template.templateName, "UTF-8")
+                                    navController.navigate(Screens.Editor.createRoute(encodedName))
                                 },
                                 colors = IconButtonDefaults.iconButtonColors(
                                     containerColor = if (isDarkTheme) CVAppColors.Components.Buttons.primaryBackgroundDark

@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Packaging
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -38,6 +40,20 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    packaging {
+        resources {
+            // Exclude duplicate license files
+            excludes += "META-INF/LICENSE-W3C-TEST"
+            excludes += "META-INF/LICENSE-LGPL-3.txt"   // Add this line
+            excludes += "META-INF/LICENSE-LGPL-2.1.txt"   // Add this line
+            excludes += "META-INF/DEPENDENCIES"  // Add this line
+            // You might also need these if they appear in future errors
+            excludes += "META-INF/LICENSE"
+            excludes += "META-INF/NOTICE"
+            excludes += "META-INF/*.kotlin_module"
+        }
     }
 }
 
@@ -88,4 +104,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     implementation ("com.itextpdf:itext7-core:7.1.16")
+
+    implementation ("com.openhtmltopdf:openhtmltopdf-core:1.0.10")
+    implementation ("com.openhtmltopdf:openhtmltopdf-pdfbox:1.0.10")
 }

@@ -1,11 +1,9 @@
 package com.example.resumegenerator.editor.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import coil.util.Logger
-import com.example.resumegenerator.editor.data.repository.PdfRepository
+import com.example.resumegenerator.editor.data.repository.HtmlPdfRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,26 +12,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EditorViewModel @Inject constructor(
-    private val pdfRepository: PdfRepository,
+    private val pdfRepository: HtmlPdfRepository,
     application: Application
 ) : AndroidViewModel(application) {
 
-    private var _templatePath: String = ""
     private val _uiState = MutableStateFlow(EditorState())
     val uiState: StateFlow<EditorState> = _uiState
 
-    fun setTemplatePath(path: String) {
-        _templatePath = path
-        _uiState.value = _uiState.value.copy(
-            personalInfo = mapOf(
-                "nameField" to "",
-                "desiredRole" to "",
-                "numberField" to "",
-                "emailField" to "",
-                "linkedinField" to "",
-                "githubField" to ""
-            )
-        )
+    private var _templateName: String = ""
+    fun setTemplate(name: String) {
+        _templateName = name
     }
 
 
@@ -103,21 +91,24 @@ class EditorViewModel @Inject constructor(
             try {
                 _uiState.value = _uiState.value.copy(isGenerating = true)
 
-                // Build the fields map with education data
-                val fields = buildMap {
+                val data = buildMap {
                     // Personal info
-                    putAll(_uiState.value.personalInfo)
+                    put("name", _uiState.value.personalInfo["nameField"] ?: "")
+                    put("email", _uiState.value.personalInfo["emailField"] ?: "")
+                    put("phone", _uiState.value.personalInfo["numberField"] ?: "")
 
-                    // Education entries
-                    _uiState.value.education.forEachIndexed { index, education ->
-                        put("education_${index}_degree", education.degree)
-                        put("education_${index}_institution", education.institution)
-                        put("education_${index}_start_and_end", education.startDateAndEndData)
+                    // Education
+                    _uiState.value.education.forEachIndexed { index, edu ->
+                        put("edu_${index}_degree", edu.degree)
+                        put("edu_${index}_institution", edu.institution)
+                        put("edu_${index}_dates", edu.startDateAndEndData)
                     }
+
+                    // Add other sections as needed
                 }
 
-                Log.d("PDF_DEBUG", "Fields being sent: $fields")
-                val generatedFile = pdfRepository.generatePdf(_templatePath, fields)
+                val generatedFile = pdfRepository.generatePdf(_templateName, data)
+
                 _uiState.value = _uiState.value.copy(
                     isGenerating = false,
                     generatedPdfPath = generatedFile?.absolutePath ?: "",
@@ -128,7 +119,6 @@ class EditorViewModel @Inject constructor(
                     isGenerating = false,
                     error = "Failed to generate PDF: ${e.message}"
                 )
-                Log.e("PDF_ERROR", "Generation failed", e)
             }
         }
     }

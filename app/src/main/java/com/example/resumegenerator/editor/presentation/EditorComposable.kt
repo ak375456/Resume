@@ -59,7 +59,7 @@ import java.io.File
 
 @Composable
 fun EditorScreen(
-    templatePath: String,
+    templateName: String,
     viewModel: EditorViewModel = hiltViewModel(),
     navController: NavHostController,
 ) {
@@ -70,8 +70,8 @@ fun EditorScreen(
     val context = LocalContext.current // Get the context
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(templatePath) {
-        viewModel.setTemplatePath(templatePath)
+    LaunchedEffect(templateName) {
+        viewModel.setTemplate(templateName)
     }
 
     LaunchedEffect(uiState.showSuccessSnackbar) {

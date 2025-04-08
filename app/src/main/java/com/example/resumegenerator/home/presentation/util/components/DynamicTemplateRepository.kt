@@ -10,11 +10,8 @@ import javax.inject.Inject
 class DynamicTemplateRepository @Inject constructor(private val context: Context) {
 
     fun getTemplates(): List<TemplateCategory> {
-        // Get all category directories in assets
-        val categories = context.assets.list("")?.filter {
-            // Only include directories and ignore special folders
-            !it.contains(".") && it != "images" && it != "fonts"
-        } ?: emptyList()
+        // Look in assets/templates directory
+        val categories = context.assets.list("templates")?.toList() ?: emptyList()
 
         return categories.mapNotNull { categoryName ->
             val templates = loadTemplatesForCategory(categoryName)
@@ -29,14 +26,15 @@ class DynamicTemplateRepository @Inject constructor(private val context: Context
 
     private fun loadTemplatesForCategory(category: String): List<Template> {
         return try {
-            context.assets.list(category)
-                ?.filter { it.endsWith(".pdf") }
-                ?.mapNotNull { pdfFile ->
+            context.assets.list("templates/$category")
+                ?.filter { it.endsWith(".html") }
+                ?.mapNotNull { file ->
+                    val baseName = file.removeSuffix(".html")
                     Template(
-                        id = "$category/$pdfFile".hashCode(),
-                        name = generateDisplayName(pdfFile),
-                        thumbnailRes = findPreviewResId(category, pdfFile),
-                        pdfAssetPath = "$category/$pdfFile"
+                        id = "$category/$baseName".hashCode(),
+                        name = generateDisplayName(baseName),
+                        thumbnailRes = findPreviewResId(category, baseName),
+                        templateName = "$category/$baseName"
                     )
                 } ?: emptyList()
         } catch (e: IOException) {
@@ -44,20 +42,18 @@ class DynamicTemplateRepository @Inject constructor(private val context: Context
         }
     }
 
-    private fun generateDisplayName(pdfFile: String): String {
-        return pdfFile
-            .removeSuffix(".pdf")
+    private fun generateDisplayName(fileName: String): String {
+        return fileName
             .replace("_", " ")
             .replaceFirstChar { it.uppercase() }
     }
 
-    private fun findPreviewResId(category: String, pdfFile: String): Int {
-        val baseName = pdfFile.removeSuffix(".pdf")
+    private fun findPreviewResId(category: String, baseName: String): Int {
         val previewNames = listOf(
-            "${category}_${baseName}_preview",  // tech_cv1_preview
-            "${baseName}_preview",             // cv1_preview
-            baseName,                          // cv1
-            "a"                                // Fallback to a.jpg
+            "${category}_${baseName}_preview",  // business_corporate_preview
+            "${baseName}_preview",             // corporate_preview
+            baseName,                          // corporate
+            "default_preview"                  // Fallback
         )
 
         return previewNames.firstNotNullOfOrNull { name ->
@@ -67,10 +63,5 @@ class DynamicTemplateRepository @Inject constructor(private val context: Context
                 null
             }
         } ?: R.drawable.default_preview
-    }
-    fun getTemplatePath(category: String, educationCount: Int): String {
-        val educationType = if (educationCount <= 1) "single_education" else "multiple_educations"
-        val templates = context.assets.list("$category/$educationType")?.filter { it.endsWith(".pdf") }
-        return "$category/$educationType/${templates?.firstOrNull() ?: "template1.pdf"}"
     }
 }

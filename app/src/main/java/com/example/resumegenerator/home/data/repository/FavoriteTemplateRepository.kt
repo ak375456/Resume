@@ -30,7 +30,7 @@ class FavoriteTemplateRepository @Inject constructor(
             id = this.id,
             name = this.name,
             thumbnailResId = this.thumbnailRes,
-            pdfAssetPath = this.pdfAssetPath
+            pdfAssetPath = this.templateName
         )
     }
 
@@ -39,7 +39,7 @@ class FavoriteTemplateRepository @Inject constructor(
             id = this.id,
             name = this.name,
             thumbnailRes = this.thumbnailResId,
-            pdfAssetPath = this.pdfAssetPath,
+            templateName = this.pdfAssetPath,
             isFavorite = true
         )
     }

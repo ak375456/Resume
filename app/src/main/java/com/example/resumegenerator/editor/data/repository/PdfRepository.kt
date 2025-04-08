@@ -11,53 +11,91 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import java.io.File
 import javax.inject.Inject
 import com.example.resumegenerator.R
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Singleton
 
-class PdfRepository @Inject constructor(
-    @ApplicationContext private val context: Context
+@Singleton
+class HtmlPdfRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val templateRepo: HtmlTemplateRepository
 ) {
-
-    fun generatePdf(templatePath: String, fields: Map<String, String>): File? {
+    fun generatePdf(templateName: String, data: Map<String, String>): File? {
         return try {
-            // Create app-specific directory in Documents
+            // Create output directory
             val documentsDir = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
                 context.getString(R.string.app_name)
-            ).apply {
-                if (!exists()) mkdirs()
-            }
+            ).apply { if (!exists()) mkdirs() }
 
-            // Generate timestamped filename
+            // Create output file
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
                 .format(Date())
-            val outputFile = File(documentsDir, "CV_$timestamp.pdf")
-            Log.d("PDF_REPO", "Received fields: $fields")
+            val outputFile = File(documentsDir, "Resume_$timestamp.pdf")
+
+            // Get HTML template
+            val htmlTemplate = templateRepo.getTemplate(templateName)
+
+            // Replace placeholders
+            var filledHtml = htmlTemplate
+            data.forEach { (key, value) ->
+                filledHtml = filledHtml.replace("{{$key}}", value)
+            }
+
             // Generate PDF
-            context.assets.open(templatePath).use { inputStream ->
-                PdfReader(inputStream).use { reader ->
-                    PdfWriter(outputFile).use { writer ->
-                        PdfDocument(reader, writer).use { pdfDoc ->
-                            PdfAcroForm.getAcroForm(pdfDoc, true)?.let { form ->
-                                fields.forEach { (fieldName, value) ->
-                                    form.getField(fieldName)?.setValue(value)
-                                }
-                            }
-                            pdfDoc.close()
-                        }
-                    }
+            FileOutputStream(outputFile).use { os ->
+                PdfRendererBuilder().apply {
+                    useFastMode()
+                    withHtmlContent(filledHtml, null)
+                    toStream(os)
+                    run()
                 }
             }
 
-            // Return simplified path info
-            outputFile.apply {
-                Log.d("PDF_SAVED", "Saved to: $absolutePath")
-            }
+            Log.d("PDF_GEN", "PDF generated at ${outputFile.absolutePath}")
+            outputFile
         } catch (e: Exception) {
-            Log.e("PDF_ERROR", "Generation failed", e)
+            Log.e("PDF_GEN", "Generation failed", e)
             null
+        }
+    }
+}
+
+
+
+@Singleton
+class HtmlTemplateRepository @Inject constructor(
+    private val context: Context
+) {
+    fun getTemplate(name: String): String {
+        return try {
+            context.assets.open("templates/$name.html")
+                .bufferedReader()
+                .use { it.readText() }
+        } catch (e: IOException) {
+            // Fallback template
+            """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .header { text-align: center; margin-bottom: 20px; }
+                    .name { font-size: 24px; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <div class="name">{{name}}</div>
+                </div>
+            </body>
+            </html>
+            """.trimIndent()
         }
     }
 }
