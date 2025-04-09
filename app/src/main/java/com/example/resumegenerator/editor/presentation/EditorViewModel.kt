@@ -1,6 +1,7 @@
 package com.example.resumegenerator.editor.presentation
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.resumegenerator.editor.data.repository.HtmlTemplateRepository
@@ -115,13 +116,49 @@ class EditorViewModel @Inject constructor(
     private fun buildHtmlContent(): String {
         val template = templateRepo.getTemplate(_templateName)
 
-        return template
+        // Basic replacements (Keep this part as is)
+        var html = template
             .replace("{{NAME}}", _uiState.value.personalInfo["nameField"] ?: "")
-            .replace("{{Role}}", _uiState.value.personalInfo["desiredRole"] ?: "")
+            .replace("{{ROLE}}", _uiState.value.personalInfo["desiredRole"] ?: "")
             .replace("{{phone}}", _uiState.value.personalInfo["numberField"] ?: "")
             .replace("{{email}}", _uiState.value.personalInfo["emailField"] ?: "")
             .replace("{{linkedin}}", _uiState.value.personalInfo["linkedinField"] ?: "")
             .replace("{{portfolio}}", _uiState.value.personalInfo["githubField"] ?: "")
+        // Add other basic replacements here (e.g., summary, skills if they are simple placeholders)
+
+        // Handle education section (Generate the replacement HTML - Keep this part as is)
+        val educationHtml = if (_uiState.value.education.isNotEmpty()) {
+            _uiState.value.education.joinToString("\n") { edu -> // Added newline for readability in HTML source
+                """
+            <div class="education-item">
+                <div class="university">${edu.institution}, ${edu.city}</div>
+                <div class="degree-date">
+                    <span class="degree">${edu.degree}</span>
+                    <span class="date">${edu.startDate} - ${edu.endDate}</span>
+                </div>
+            </div>
+            """.trimIndent()
+            }
+        } else {
+            "" // Generate empty string if there's no education data
+        }
+
+
+        // *** Corrected Replacement Logic ***
+        // Regex to find the entire block from {{#EDUCATION}} to {{/EDUCATION}}
+        // and replace it with the generated educationHtml.
+        // RegexOption.DOT_MATCHES_ALL allows the '.' to match newline characters.
+        val educationSectionRegex = Regex("\\{\\{#EDUCATION\\}\\}.*?\\{\\{/EDUCATION\\}\\}", RegexOption.DOT_MATCHES_ALL)
+
+        // Replace the entire section block, or just append if the markers aren't found (optional fallback)
+        if (html.contains("{{#EDUCATION}}") && html.contains("{{/EDUCATION}}")) {
+            html = educationSectionRegex.replace(html, educationHtml)
+        } else if (_uiState.value.education.isNotEmpty()) {
+            Log.d("EditorViewModel", "Education markers not found in template '$_templateName'")
+        }
+
+
+        return html
     }
 
     fun dismissSnackbar() {

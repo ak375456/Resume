@@ -66,15 +66,29 @@ import com.example.util.textFieldColors
                 modifier = Modifier.fillMaxWidth(),
                 colors = textFieldColors(isDarkTheme)
             )
+            TextField(
+                value = education.city,
+                onValueChange = { onValueChange(education.copy(city = it)) },
+                label = { Text("City") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors(isDarkTheme)
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 TextField(
-                    value = education.startDateAndEndData,
-                    onValueChange = { onValueChange(education.copy(startDateAndEndData = it)) },
-                    label = { Text("Start Date And End Date (MMM YYYY)") },
+                    value = education.startDate,
+                    onValueChange = { onValueChange(education.copy(startDate = it)) },
+                    label = { Text("Start Date(MMM-YYYY)") },
+                    modifier = Modifier.weight(1f),
+                    colors = textFieldColors(isDarkTheme)
+                )
+                TextField(
+                    value = education.endDate,
+                    onValueChange = { onValueChange(education.copy(endDate = it)) },
+                    label = { Text("End Date (MMM-YYYY)") },
                     modifier = Modifier.weight(1f),
                     colors = textFieldColors(isDarkTheme)
                 )
