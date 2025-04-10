@@ -144,10 +144,7 @@ class EditorViewModel @Inject constructor(
         val experienceHtml = _uiState.value.experiences.joinToString("\n") { exp ->
 
             val descriptionHtml = if (exp.useBulletPoints) {
-                exp.description
-                    .lines()
-                    .filter { it.isNotBlank() }
-                    .joinToString("<br>") { "• ${it.trim()}" }
+                exp.description.lines().joinToString("<br>• ", "• ", "") { it.trim() }
             } else {
                 exp.description.replace("\n", "<br>")
             }

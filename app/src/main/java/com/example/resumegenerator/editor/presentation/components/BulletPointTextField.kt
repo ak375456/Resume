@@ -3,15 +3,9 @@ package com.example.resumegenerator.editor.presentation.components
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.semantics.SemanticsProperties.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import com.example.util.textFieldColors
 
@@ -28,11 +22,10 @@ fun BulletPointTextField(
 ) {
     val bullet = "• "
 
-    // We apply the bullets only for display
-    val displayValue = remember(value, useBulletPoints) {
-        if (useBulletPoints) {
+    val processedValue = remember(value, useBulletPoints) {
+        if (useBulletPoints && value.isNotEmpty()) {
             value.lines().joinToString("\n") { line ->
-                if (line.isNotBlank() && !line.startsWith(bullet)) "$bullet$line" else line
+                if (line.startsWith(bullet)) line else "$bullet$line"
             }
         } else {
             value
@@ -41,28 +34,32 @@ fun BulletPointTextField(
 
     val onTextChange = { text: String ->
         if (useBulletPoints) {
-            // Remove bullet prefix before saving to model
-            val cleanText = text.lines().joinToString("\n") { line ->
-                line.removePrefix(bullet)
+            // Handle bullet point logic
+            val newText = if (text.endsWith("\n")) {
+                "$text$bullet"
+            } else {
+                text
             }
-            onValueChange(cleanText)
+            // Remove bullets before saving to model
+            onValueChange(newText.lines().joinToString("\n") {
+                it.removePrefix(bullet)
+            })
         } else {
             onValueChange(text)
         }
     }
 
     OutlinedTextField(
-        value = displayValue,
+        value = processedValue,
         onValueChange = onTextChange,
         modifier = modifier,
         enabled = enabled,
         label = label,
         colors = textFieldColors(isDarkTheme),
-        keyboardOptions = KeyboardOptions(
-            imeAction = androidx.compose.ui.text.input.ImeAction.Default
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Default
         ),
-        visualTransformation = VisualTransformation.None,
+        visualTransformation = if (useBulletPoints) VisualTransformation.None else VisualTransformation.None,
         maxLines = 5
     )
 }
-
