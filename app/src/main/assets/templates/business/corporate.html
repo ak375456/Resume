@@ -44,9 +44,12 @@
         }
         .degree {
             font-style: italic;
+            width: 70%;
         }
         .date {
             font-weight: 500;
+            text-align: right;
+            width: 30%;
         }
     </style>
 </head>
@@ -55,7 +58,7 @@
     <div class="name">{{NAME}}</div>
     <div class="role">{{ROLE}}</div>
     <div class="contact">
-        {{phone}} | {{email}} | {{linkedin}} | {{portfolio}}
+        {{phone}} • {{email}} • {{linkedin}} • {{portfolio}}
     </div>
 </div>
 
@@ -66,8 +69,8 @@
 <div class="education-item">
     <div class="university">{{institution}}, {{city}}</div>
     <div class="degree-date">
-        <span class="degree">{{degree}}</span>
-        <span class="date">{{startDate}} - {{endDate}}</span>
+        <div class="degree">{{degree}}</div>
+        <div class="date">{{startDate}} - {{endDate}}</div>
     </div>
 </div>
 {{/EDUCATION}}
