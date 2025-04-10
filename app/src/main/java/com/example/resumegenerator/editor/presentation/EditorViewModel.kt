@@ -127,40 +127,52 @@ class EditorViewModel @Inject constructor(
         // Add other basic replacements here (e.g., summary, skills if they are simple placeholders)
 
         // Handle education section (Generate the replacement HTML - Keep this part as is)
-        val educationHtml = if (_uiState.value.education.isNotEmpty()) {
-            _uiState.value.education.joinToString("\n") { edu -> // Added newline for readability in HTML source
-                """
-            <div class="education-item">
-                <div class="university">${edu.institution}</div>
-                <div class="degree-date">
-                    <span class="degree">${edu.degree}</span>
-                    <span class="date">${edu.startDate} - ${edu.endDate}</span>
-                </div>
+        val educationHtml = _uiState.value.education.joinToString("\n") { edu ->
+            """
+        <div class="education-item">
+            <div class="university">${edu.institution}</div>
+            <div class="degree-date">
+                <span class="degree">${edu.degree}</span>
+                <span class="date">${edu.startDate} - ${edu.endDate}</span>
             </div>
-            """.trimIndent()
+        </div>
+        """.trimIndent()
+        }
+        html = html.replaceSection("EDUCATION", educationHtml)
+
+        // 🔹 Generate and replace experience section
+        val experienceHtml = _uiState.value.experiences.joinToString("\n") { exp ->
+
+            val descriptionHtml = if (exp.useBulletPoints) {
+                exp.description
+                    .lines()
+                    .filter { it.isNotBlank() }
+                    .joinToString("<br>") { "• ${it.trim()}" }
+            } else {
+                exp.description.replace("\n", "<br>")
             }
-        } else {
-            "" // Generate empty string if there's no education data
+
+            """
+    <div class="experience-item">
+        <div class="experience-header">
+            <div class="experience-role">${exp.jobTitle}, ${exp.company}</div>
+            <div class="date">${exp.startDate} - ${exp.endDate}</div>
+        </div>
+        <div class="experience-description">${descriptionHtml}</div>
+    </div>
+    """.trimIndent()
         }
-
-
-        // *** Corrected Replacement Logic ***
-        // Regex to find the entire block from {{#EDUCATION}} to {{/EDUCATION}}
-        // and replace it with the generated educationHtml.
-        // RegexOption.DOT_MATCHES_ALL allows the '.' to match newline characters.
-        val educationSectionRegex = Regex("\\{\\{#EDUCATION\\}\\}.*?\\{\\{/EDUCATION\\}\\}", RegexOption.DOT_MATCHES_ALL)
-
-        // Replace the entire section block, or just append if the markers aren't found (optional fallback)
-        if (html.contains("{{#EDUCATION}}") && html.contains("{{/EDUCATION}}")) {
-            html = educationSectionRegex.replace(html, educationHtml)
-        } else if (_uiState.value.education.isNotEmpty()) {
-            Log.d("EditorViewModel", "Education markers not found in template '$_templateName'")
-        }
+        html = html.replaceSection("EXPERIENCE", experienceHtml)
 
 
         return html
     }
+
     private fun String.replaceSection(tag: String, content: String): String {
+        // *** Corrected Replacement Logic ***
+        // Regex to find the entire block from {{#EDUCATION}} to {{/EDUCATION}}
+        // and replace it with the generated educationHtml.
+        // RegexOption.DOT_MATCHES_ALL allows the '.' to match newline characters.
         val regex = Regex("\\{\\{#$tag\\}\\}.*?\\{\\{/$tag\\}\\}", RegexOption.DOT_MATCHES_ALL)
         return if (contains("{{#$tag}}") && contains("{{/$tag}}")) {
             replace(regex, content)
@@ -168,6 +180,15 @@ class EditorViewModel @Inject constructor(
             Log.d("EditorViewModel", "Section markers for '$tag' not found.")
             this
         }
+    }
+
+    // Add this to your EditorViewModel
+    fun toggleBulletPoints(experience: Experience) {
+        _uiState.value = _uiState.value.copy(
+            experiences = _uiState.value.experiences.map {
+                if (it.id == experience.id) it.copy(useBulletPoints = !it.useBulletPoints) else it
+            }
+        )
     }
 
 

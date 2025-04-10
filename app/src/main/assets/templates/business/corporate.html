@@ -49,34 +49,31 @@
         .degree-date {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            width: 100%;
             margin-top: 3px;
         }
 
         .degree {
-            font-weight: bold;
+            width: 70%;
         }
 
         .date {
             text-align: right;
             white-space: nowrap;
+            width: 30%;
+            font-weight: 500;
         }
-
+        .experience-item {
+            margin-bottom: 0px;
+        }
         .experience-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            width: 100%;
+            margin-top: 3px
         }
 
         .experience-role {
-            font-weight: bold;
-        }
-
-        .experience-date {
-            text-align: right;
-            white-space: nowrap;
+            font-weight: 700;
+            width: 70%;
         }
 
         .experience-description {
@@ -101,8 +98,8 @@
 <div class="education-item">
     <div class="university">{{institution}}, {{city}}</div>
     <div class="degree-date">
-        <span class="degree">{{degree}}</span>
-        <span class="date">{{startDate}} - {{endDate}}</span>
+        <div class="degree">{{degree}}</div>
+        <div class="date">{{startDate}} - {{endDate}}</div>
     </div>
     <div class="description">{{description}}</div>
 </div>
@@ -113,8 +110,8 @@
 {{#EXPERIENCE}}
 <div class="experience-item">
     <div class="experience-header">
-        <span class="experience-role">{{role}}, {{company}}</span>
-        <span class="experience-date">{{startDate}} - {{endDate}}</span>
+        <div class="experience-role">{{role}}, {{company}}</div>
+        <div class="date">{{startDate}} - {{endDate}}</div>
     </div>
     <div class="experience-description">{{description}}</div>
 </div>

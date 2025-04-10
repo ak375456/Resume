@@ -26,6 +26,8 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -46,6 +48,7 @@ import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Trash
 import com.example.resumegenerator.components.SuccessSnackbar
 import com.example.resumegenerator.components.SuccessSnackbarVisuals
+import com.example.resumegenerator.editor.presentation.components.BulletPointTextField
 import com.example.resumegenerator.editor.presentation.components.EducationItem
 import com.example.resumegenerator.editor.presentation.components.PersonalInfoSection
 import com.example.resumegenerator.editor.presentation.components.SectionHeader
@@ -243,7 +246,8 @@ private fun ExperienceItem(
     experience: Experience,
     onValueChange: (Experience) -> Unit,
     isDarkTheme: Boolean,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
+    viewModel: EditorViewModel = hiltViewModel()
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -289,7 +293,7 @@ private fun ExperienceItem(
                 TextField(
                     value = experience.startDate,
                     onValueChange = { onValueChange(experience.copy(startDate = it)) },
-                    label = { Text("Start Date (MMM YYYY)") },
+                    label = { Text("Start Date") },
                     modifier = Modifier.weight(1f),
                     colors = textFieldColors(isDarkTheme)
                 )
@@ -297,19 +301,49 @@ private fun ExperienceItem(
                 TextField(
                     value = experience.endDate,
                     onValueChange = { onValueChange(experience.copy(endDate = it)) },
-                    label = { Text("End Date (MMM YYYY)") },
+                    label = { Text("End Date") },
                     modifier = Modifier.weight(1f),
                     colors = textFieldColors(isDarkTheme)
                 )
             }
 
-            OutlinedTextField(
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Bullet Points",
+                    color = if (isDarkTheme) CVAppColors.Light.textPrimary
+                    else CVAppColors.Dark.textPrimary,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+
+                Switch(
+                    checked = experience.useBulletPoints,
+                    onCheckedChange = {
+                        viewModel.toggleBulletPoints(experience)
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = if (isDarkTheme) CVAppColors.Components.Switch.thumbCheckedDark
+                        else CVAppColors.Components.Switch.thumbCheckedLight,
+                        uncheckedThumbColor = if (isDarkTheme) CVAppColors.Components.Switch.thumbUncheckedDark
+                        else CVAppColors.Components.Switch.thumbUncheckedLight,
+                        checkedTrackColor = if (isDarkTheme) CVAppColors.Components.Switch.trackCheckedDark
+                        else CVAppColors.Components.Switch.trackCheckedLight,
+                        uncheckedTrackColor = if (isDarkTheme) CVAppColors.Components.Switch.trackUncheckedDark
+                        else CVAppColors.Components.Switch.trackUncheckedLight
+                    )
+                )
+            }
+
+            BulletPointTextField(
                 value = experience.description,
                 onValueChange = { onValueChange(experience.copy(description = it)) },
-                label = { Text("Description") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors(isDarkTheme),
-                maxLines = 3
+                isDarkTheme = isDarkTheme,
+                useBulletPoints = experience.useBulletPoints,
+                label = { Text("Description") }
             )
         }
     }

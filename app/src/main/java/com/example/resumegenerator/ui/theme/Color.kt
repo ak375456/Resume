@@ -96,6 +96,34 @@ object CVAppColors {
             val disabledContentDark = Color(0xFF707070)
         }
 
+        object Switch {
+            // Light theme colors
+            val thumbCheckedLight = Light.primary
+            val thumbUncheckedLight = Light.surface
+            val trackCheckedLight = Light.primary.copy(alpha = 0.5f)
+            val trackUncheckedLight = Color(0xFFB0B0B0).copy(alpha = 0.5f)
+            val borderCheckedLight = Color.Transparent
+            val borderUncheckedLight = Color(0xFFB0B0B0)
+
+            // Dark theme colors
+            val thumbCheckedDark = Dark.primary
+            val thumbUncheckedDark = Dark.surface
+            val trackCheckedDark = Dark.primary.copy(alpha = 0.5f)
+            val trackUncheckedDark = Color(0xFF5E5E5E).copy(alpha = 0.5f)
+            val borderCheckedDark = Color.Transparent
+            val borderUncheckedDark = Color(0xFF5E5E5E)
+
+            // Disabled states
+            val disabledThumbCheckedLight = thumbCheckedLight.copy(alpha = 0.38f)
+            val disabledThumbUncheckedLight = thumbUncheckedLight.copy(alpha = 0.38f)
+            val disabledTrackCheckedLight = trackCheckedLight.copy(alpha = 0.12f)
+            val disabledTrackUncheckedLight = trackUncheckedLight.copy(alpha = 0.12f)
+            val disabledThumbCheckedDark = thumbCheckedDark.copy(alpha = 0.38f)
+            val disabledThumbUncheckedDark = thumbUncheckedDark.copy(alpha = 0.38f)
+            val disabledTrackCheckedDark = trackCheckedDark.copy(alpha = 0.12f)
+            val disabledTrackUncheckedDark = trackUncheckedDark.copy(alpha = 0.12f)
+        }
+
         // Text Fields
         object Fields {
             val backgroundLight = Light.surface

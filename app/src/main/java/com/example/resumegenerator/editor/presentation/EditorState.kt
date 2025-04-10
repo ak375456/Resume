@@ -32,6 +32,7 @@ data class Experience(
     val company: String = "",
     val startDate: String = "",
     val endDate: String = "",
-    val description: String = ""
+    val description: String = "",
+    val useBulletPoints: Boolean = false
 )
 
