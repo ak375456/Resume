@@ -22,7 +22,6 @@ data class Education(
     val id: String = UUID.randomUUID().toString(),
     val degree: String = "",
     val institution: String = "",
-    val city: String = "", // Added city field
     val startDate: String = "",
     val endDate: String = ""
 )

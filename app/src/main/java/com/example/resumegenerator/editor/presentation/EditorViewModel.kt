@@ -131,7 +131,7 @@ class EditorViewModel @Inject constructor(
             _uiState.value.education.joinToString("\n") { edu -> // Added newline for readability in HTML source
                 """
             <div class="education-item">
-                <div class="university">${edu.institution}, ${edu.city}</div>
+                <div class="university">${edu.institution}</div>
                 <div class="degree-date">
                     <span class="degree">${edu.degree}</span>
                     <span class="date">${edu.startDate} - ${edu.endDate}</span>
@@ -160,6 +160,16 @@ class EditorViewModel @Inject constructor(
 
         return html
     }
+    private fun String.replaceSection(tag: String, content: String): String {
+        val regex = Regex("\\{\\{#$tag\\}\\}.*?\\{\\{/$tag\\}\\}", RegexOption.DOT_MATCHES_ALL)
+        return if (contains("{{#$tag}}") && contains("{{/$tag}}")) {
+            replace(regex, content)
+        } else {
+            Log.d("EditorViewModel", "Section markers for '$tag' not found.")
+            this
+        }
+    }
+
 
     fun dismissSnackbar() {
         _uiState.value = _uiState.value.copy(showSuccessSnackbar = false)

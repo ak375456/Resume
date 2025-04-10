@@ -5,21 +5,29 @@ import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,12 +42,16 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Trash
 import com.example.resumegenerator.components.SuccessSnackbar
 import com.example.resumegenerator.components.SuccessSnackbarVisuals
 import com.example.resumegenerator.editor.presentation.components.EducationItem
 import com.example.resumegenerator.editor.presentation.components.PersonalInfoSection
 import com.example.resumegenerator.editor.presentation.components.SectionHeader
 import com.example.resumegenerator.ui.theme.CVAppColors
+import com.example.resumegenerator.ui.theme.CVAppColors.Components.Icons
+import com.example.util.textFieldColors
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -180,6 +192,24 @@ private fun EditorContent(
             }
         }
 
+        // Experience Section
+        SectionHeader(
+            title = "Work Experience",
+            actionText = "Add Experience",
+            onActionClick = onAddExperience
+        )
+        uiState.experiences.forEach { experience ->
+            ExperienceItem(
+                experience = experience,
+                onValueChange = onExperienceChange,
+                isDarkTheme = isDarkTheme,
+                onRemove = {
+                    viewModel.removeExperience(experience.id)
+                }
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
 
         Button(
             onClick = onGenerateClick,
@@ -204,6 +234,83 @@ private fun EditorContent(
                 )
             }
             Text("Generate PDF")
+        }
+    }
+}
+
+@Composable
+private fun ExperienceItem(
+    experience: Experience,
+    onValueChange: (Experience) -> Unit,
+    isDarkTheme: Boolean,
+    onRemove: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDarkTheme) CVAppColors.Components.Cards.backgroundDark
+            else CVAppColors.Components.Cards.backgroundLight
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                TextField(
+                    value = experience.jobTitle,
+                    onValueChange = { onValueChange(experience.copy(jobTitle = it)) },
+                    label = { Text("Job Title") },
+                    modifier = Modifier.weight(1f),
+                    colors = textFieldColors(isDarkTheme)
+                )
+
+                IconButton(onClick = onRemove) {
+                    Icon(Lucide.Trash, contentDescription = "Remove")
+                }
+            }
+
+            TextField(
+                value = experience.company,
+                onValueChange = { onValueChange(experience.copy(company = it)) },
+                label = { Text("Company") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors(isDarkTheme)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TextField(
+                    value = experience.startDate,
+                    onValueChange = { onValueChange(experience.copy(startDate = it)) },
+                    label = { Text("Start Date (MMM YYYY)") },
+                    modifier = Modifier.weight(1f),
+                    colors = textFieldColors(isDarkTheme)
+                )
+
+                TextField(
+                    value = experience.endDate,
+                    onValueChange = { onValueChange(experience.copy(endDate = it)) },
+                    label = { Text("End Date (MMM YYYY)") },
+                    modifier = Modifier.weight(1f),
+                    colors = textFieldColors(isDarkTheme)
+                )
+            }
+
+            OutlinedTextField(
+                value = experience.description,
+                onValueChange = { onValueChange(experience.copy(description = it)) },
+                label = { Text("Description") },
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors(isDarkTheme),
+                maxLines = 3
+            )
         }
     }
 }

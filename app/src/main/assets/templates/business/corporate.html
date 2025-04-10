@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <style>
         body {
@@ -7,23 +8,28 @@
             margin: 20px;
             line-height: 1.5;
         }
+
         .header {
             text-align: center;
             margin-bottom: 0px;
         }
+
         .name {
             font-size: 28px;
             font-weight: bold;
             margin-bottom: 0px;
         }
+
         .role {
             font-size: 16px;
             margin-bottom: 0px;
         }
+
         .contact {
             font-size: 9px;
             margin-bottom: 0px;
         }
+
         .section-title {
             font-size: 18px;
             font-weight: bold;
@@ -31,28 +37,54 @@
             border-bottom: 1px solid #333;
             padding-bottom: 5px;
         }
+
         .education-item {
             margin-bottom: 0px;
         }
+
         .university {
             font-weight: bold;
         }
+
         .degree-date {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            width: 100%;
             margin-top: 3px;
         }
+
         .degree {
-            font-style: italic;
-            width: 70%;
+            font-weight: bold;
         }
+
         .date {
-            font-weight: 500;
             text-align: right;
-            width: 30%;
+            white-space: nowrap;
+        }
+
+        .experience-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .experience-role {
+            font-weight: bold;
+        }
+
+        .experience-date {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .experience-description {
+            margin-left: 4px;
         }
     </style>
 </head>
+
 <body>
 <div class="header">
     <div class="name">{{NAME}}</div>
@@ -69,12 +101,26 @@
 <div class="education-item">
     <div class="university">{{institution}}, {{city}}</div>
     <div class="degree-date">
-        <div class="degree">{{degree}}</div>
-        <div class="date">{{startDate}} - {{endDate}}</div>
+        <span class="degree">{{degree}}</span>
+        <span class="date">{{startDate}} - {{endDate}}</span>
     </div>
+    <div class="description">{{description}}</div>
 </div>
 {{/EDUCATION}}
 
+<div class="section-title">EXPERIENCE</div>
+
+{{#EXPERIENCE}}
+<div class="experience-item">
+    <div class="experience-header">
+        <span class="experience-role">{{role}}, {{company}}</span>
+        <span class="experience-date">{{startDate}} - {{endDate}}</span>
+    </div>
+    <div class="experience-description">{{description}}</div>
+</div>
+{{/EXPERIENCE}}
+
 <!-- Add other sections as needed -->
 </body>
+
 </html>

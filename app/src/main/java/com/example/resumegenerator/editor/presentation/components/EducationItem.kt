@@ -66,13 +66,6 @@ import com.example.util.textFieldColors
                 modifier = Modifier.fillMaxWidth(),
                 colors = textFieldColors(isDarkTheme)
             )
-            TextField(
-                value = education.city,
-                onValueChange = { onValueChange(education.copy(city = it)) },
-                label = { Text("City") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors(isDarkTheme)
-            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
