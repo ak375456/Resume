@@ -1,18 +1,22 @@
 package com.example.resumegenerator.editor.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,14 +25,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.composables.icons.lucide.BadgeHelp
+import com.composables.icons.lucide.IndentDecrease
+import com.composables.icons.lucide.Lucide
 import com.example.resumegenerator.ui.theme.CVAppColors
 import com.example.util.textFieldColors
 
@@ -40,60 +46,162 @@ fun BulletPointHandler(
     text: String,
     onTextChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    isDarkTheme: Boolean
+    isDarkTheme: Boolean,
+    label: String? = null,
+    placeholder: String = "Description"
 ) {
     val bullet = "• "
-    var textFieldValue by remember { mutableStateOf(TextFieldValue(text)) }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
+    var showHelpDialog by remember { mutableStateOf(false) }
 
     // Handle external text changes
     LaunchedEffect(text) {
-        if (textFieldValue.text != text) {
-            textFieldValue = TextFieldValue(text)
+        if (text != textFieldValue.text) {
+            textFieldValue = TextFieldValue(text, TextRange(text.length))
         }
     }
 
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Bullet point button
-        IconButton(
-            onClick = {
-                val currentText = textFieldValue.text
-                val selection = textFieldValue.selection
-                val newText = currentText.substring(0, selection.start) +
-                        bullet + currentText.substring(selection.start)
-                textFieldValue = textFieldValue.copy(
-                    text = newText,
-                    selection = TextRange(selection.start + bullet.length)
-                )
-                onTextChange(newText)
-            },
-            modifier = Modifier.size(48.dp)
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "•",
-                style = MaterialTheme.typography.titleLarge,
-                color = if (!isDarkTheme) CVAppColors.Light.textPrimary
-                else CVAppColors.Dark.textPrimary
-            )
+            label?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = if (isDarkTheme) CVAppColors.Dark.textSecondary
+                    else CVAppColors.Light.textSecondary
+                )
+            }
+
+            // Combined buttons in a row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.weight(1f)
+            ) {
+                IconButton(
+                    onClick = { showHelpDialog = true },
+                    modifier = Modifier.size(24.dp)
+                ) {
+                    androidx.compose.material3.Icon(
+                        imageVector = Lucide.BadgeHelp,
+                        contentDescription = "Help",
+                        tint = if (isDarkTheme) CVAppColors.Dark.textTertiary
+                        else CVAppColors.Light.textTertiary
+                    )
+                }
+
+                TextButton(
+                    onClick = {
+                        val currentText = textFieldValue.text
+                        val selection = textFieldValue.selection
+                        val newText = currentText.substring(0, selection.start) +
+                                bullet + currentText.substring(selection.start)
+                        textFieldValue = TextFieldValue(
+                            text = newText,
+                            selection = TextRange(selection.start + bullet.length)
+                        )
+                        onTextChange(newText)
+                    },
+                    modifier = Modifier.padding(start = 4.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = if (isDarkTheme) CVAppColors.Dark.primary
+                        else CVAppColors.Light.primary
+                    )
+                ) {
+                    Text("•", style = TextStyle(fontSize = 24.sp))
+                }
+            }
         }
 
-        // The actual text field
+        Spacer(modifier = Modifier.height(8.dp))
+
         OutlinedTextField(
             value = textFieldValue,
             onValueChange = { newValue ->
                 textFieldValue = newValue
                 onTextChange(newValue.text)
             },
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.fillMaxWidth(),
             colors = textFieldColors(isDarkTheme),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                imeAction = ImeAction.Default
-            ),
-            visualTransformation = VisualTransformation.None,
-            maxLines = 5
+            placeholder = {
+                Text(
+                    placeholder,
+                    color = if (isDarkTheme) CVAppColors.Dark.textTertiary
+                    else CVAppColors.Light.textTertiary
+                )
+            },
+            singleLine = false,
+            minLines = 4,
+            maxLines = 7,
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                color = if (isDarkTheme) CVAppColors.Dark.textPrimary
+                else CVAppColors.Light.textPrimary
+            )
         )
+
+        // Help dialog
+        if (showHelpDialog) {
+            AlertDialog(
+                onDismissRequest = { showHelpDialog = false },
+                title = {
+                    Text(
+                        "Bullet Points Tips",
+                        color = if (isDarkTheme) CVAppColors.Dark.textPrimary
+                        else CVAppColors.Light.textPrimary
+                    )
+                },
+                text = {
+                    Column {
+                        Text(
+                            "• Start each point with a strong action verb",
+                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
+                            else CVAppColors.Light.textSecondary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "• Keep points concise and impactful",
+                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
+                            else CVAppColors.Light.textSecondary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "• Focus on achievements and results",
+                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
+                            else CVAppColors.Light.textSecondary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "• Use bullet points (•) for 75%+ of your experience descriptions",
+                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
+                            else CVAppColors.Light.textSecondary
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            "• ATS systems scan bullets 40% faster than paragraphs",
+                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
+                            else CVAppColors.Light.textSecondary
+                        )
+
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = { showHelpDialog = false },
+                        colors = ButtonDefaults.textButtonColors(
+                            contentColor = if (isDarkTheme) CVAppColors.Dark.primary
+                            else CVAppColors.Light.primary
+                        )
+                    ) {
+                        Text("Got it")
+                    }
+                },
+                containerColor = if (isDarkTheme) CVAppColors.Dark.surface
+                else CVAppColors.Light.surface
+            )
+        }
     }
 }

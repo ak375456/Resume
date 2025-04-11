@@ -313,7 +313,7 @@ private fun ExperienceItem(
             BulletPointHandler(
                 text = experience.description,
                 onTextChange = { onValueChange(experience.copy(description = it)) },
-                isDarkTheme = isDarkTheme
+                isDarkTheme = isDarkTheme,
             )
         }
     }
