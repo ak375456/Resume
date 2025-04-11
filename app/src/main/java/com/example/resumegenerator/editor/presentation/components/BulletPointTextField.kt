@@ -56,7 +56,8 @@ fun BulletPointHandler(
 
     // Handle external text changes
     LaunchedEffect(text) {
-        if (text != textFieldValue.text) {
+        // Only update if the text has changed significantly (not due to user typing)
+        if (text != textFieldValue.text && !textFieldValue.text.contains(text) && !text.contains(textFieldValue.text)) {
             textFieldValue = TextFieldValue(text, TextRange(text.length))
         }
     }
