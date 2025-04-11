@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -12,24 +13,32 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.composables.icons.lucide.BadgeHelp
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Trash
+import com.example.resumegenerator.components.TipAlertDialog
 import com.example.resumegenerator.editor.presentation.EditorViewModel
 import com.example.resumegenerator.editor.presentation.Education
 import com.example.resumegenerator.ui.theme.CVAppColors
 import com.example.util.textFieldColors
 
 @Composable
- fun EducationItem(
+fun EducationItem(
     education: Education,
     onValueChange: (Education) -> Unit,
     isDarkTheme: Boolean,
     onRemove: () -> Unit,
-    viewModel: EditorViewModel = hiltViewModel()
+    viewModel: EditorViewModel = hiltViewModel(),
 ) {
+    var showHelpDialog by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -44,7 +53,8 @@ import com.example.util.textFieldColors
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically  // Add this for vertical alignment
             ) {
                 TextField(
                     value = education.degree,
@@ -54,8 +64,21 @@ import com.example.util.textFieldColors
                     colors = textFieldColors(isDarkTheme)
                 )
 
-                IconButton(onClick = onRemove) {
-                    Icon(Lucide.Trash, contentDescription = "Remove Education")
+                // Group the icons in a nested Row for consistent spacing
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)  // Consistent spacing between icons
+                ) {
+                    IconButton(onClick = onRemove) {
+                        Icon(Lucide.Trash, contentDescription = "Remove Education")
+                    }
+
+                    IconButton(onClick = { showHelpDialog = true }) {  // Remove size modifier
+                        Icon(
+                            imageVector = Lucide.BadgeHelp,
+                            contentDescription = "Help"
+                        )
+                    }
                 }
             }
 
@@ -88,5 +111,20 @@ import com.example.util.textFieldColors
 
             }
         }
+        val bulletTips = listOf(
+            "Start with your most recent degree and list older degrees in descending order",
+            "Mention relevant coursework",
+            "83% of employers focus on education section for entry-level positions",
+            "For experienced professionals, keep education brief and prioritize work experience",
+
+        )
+
+        TipAlertDialog(
+            title = "Bullet Points Tips",
+            tips = bulletTips,
+            showDialog = showHelpDialog,
+            onDismiss = { showHelpDialog = false },
+            isDarkTheme = isDarkTheme
+        )
     }
 }

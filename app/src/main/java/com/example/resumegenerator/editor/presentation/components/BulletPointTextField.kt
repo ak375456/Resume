@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.composables.icons.lucide.BadgeHelp
 import com.composables.icons.lucide.IndentDecrease
 import com.composables.icons.lucide.Lucide
+import com.example.resumegenerator.components.TipAlertDialog
 import com.example.resumegenerator.ui.theme.CVAppColors
 import com.example.util.textFieldColors
 
@@ -145,64 +146,21 @@ fun BulletPointHandler(
         )
 
         // Help dialog
-        if (showHelpDialog) {
-            AlertDialog(
-                onDismissRequest = { showHelpDialog = false },
-                title = {
-                    Text(
-                        "Bullet Points Tips",
-                        color = if (isDarkTheme) CVAppColors.Dark.textPrimary
-                        else CVAppColors.Light.textPrimary
-                    )
-                },
-                text = {
-                    Column {
-                        Text(
-                            "• Start each point with a strong action verb",
-                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
-                            else CVAppColors.Light.textSecondary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "• Keep points concise and impactful",
-                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
-                            else CVAppColors.Light.textSecondary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "• Focus on achievements and results",
-                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
-                            else CVAppColors.Light.textSecondary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "• Use bullet points (•) for 75%+ of your experience descriptions",
-                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
-                            else CVAppColors.Light.textSecondary
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            "• ATS systems scan bullets 40% faster than paragraphs",
-                            color = if (isDarkTheme) CVAppColors.Dark.textSecondary
-                            else CVAppColors.Light.textSecondary
-                        )
+        // Use the reusable dialog component
+        val bulletTips = listOf(
+            "Start each point with a strong action verb",
+            "Keep points concise and impactful",
+            "Focus on achievements and results",
+            "Use bullet points (•) for 75%+ of your experience descriptions",
+            "ATS systems scan bullets 40% faster than paragraphs"
+        )
 
-                    }
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = { showHelpDialog = false },
-                        colors = ButtonDefaults.textButtonColors(
-                            contentColor = if (isDarkTheme) CVAppColors.Dark.primary
-                            else CVAppColors.Light.primary
-                        )
-                    ) {
-                        Text("Got it")
-                    }
-                },
-                containerColor = if (isDarkTheme) CVAppColors.Dark.surface
-                else CVAppColors.Light.surface
-            )
-        }
+        TipAlertDialog(
+            title = "Bullet Points Tips",
+            tips = bulletTips,
+            showDialog = showHelpDialog,
+            onDismiss = { showHelpDialog = false },
+            isDarkTheme = isDarkTheme
+        )
     }
 }
