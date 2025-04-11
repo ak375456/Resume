@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.composables.icons.lucide.BadgeHelp
+import com.composables.icons.lucide.Lightbulb
 import com.composables.icons.lucide.Lucide
 import com.composables.icons.lucide.Trash
 import com.example.resumegenerator.components.TipAlertDialog
@@ -75,7 +76,7 @@ fun EducationItem(
 
                     IconButton(onClick = { showHelpDialog = true }) {  // Remove size modifier
                         Icon(
-                            imageVector = Lucide.BadgeHelp,
+                            imageVector = Lucide.Lightbulb,
                             contentDescription = "Help"
                         )
                     }
@@ -120,7 +121,7 @@ fun EducationItem(
         )
 
         TipAlertDialog(
-            title = "Bullet Points Tips",
+            title = "Education Tips",
             tips = bulletTips,
             showDialog = showHelpDialog,
             onDismiss = { showHelpDialog = false },

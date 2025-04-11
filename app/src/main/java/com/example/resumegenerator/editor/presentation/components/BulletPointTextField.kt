@@ -49,7 +49,8 @@ fun BulletPointHandler(
     modifier: Modifier = Modifier,
     isDarkTheme: Boolean,
     label: String? = null,
-    placeholder: String = "Description"
+    placeholder: String = "Description",
+    bulletTips: List<String> = emptyList()
 ) {
     val bullet = "• "
     var textFieldValue by remember { mutableStateOf(TextFieldValue(text, TextRange(text.length))) }
@@ -91,11 +92,8 @@ fun BulletPointHandler(
                     androidx.compose.material3.Icon(
                         imageVector = Lucide.BadgeHelp,
                         contentDescription = "Help",
-                        tint = if (isDarkTheme) CVAppColors.Dark.textTertiary
-                        else CVAppColors.Light.textTertiary
                     )
                 }
-
                 TextButton(
                     onClick = {
                         val currentText = textFieldValue.text

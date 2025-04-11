@@ -76,11 +76,12 @@ class EditorViewModel @Inject constructor(
         )
     }
 
-    fun updateSummary(summary: String) {
+    fun updateSummary(newSummary: Summary) {
         _uiState.value = _uiState.value.copy(
-            summary = summary
+            summary = newSummary
         )
     }
+
     fun removeEducation(id: String) {
         _uiState.value = _uiState.value.copy(
             education = _uiState.value.education.filter { it.id != id }
@@ -124,7 +125,7 @@ class EditorViewModel @Inject constructor(
             .replace("{{email}}", _uiState.value.personalInfo["emailField"] ?: "")
             .replace("{{linkedin}}", _uiState.value.personalInfo["linkedinField"] ?: "")
             .replace("{{portfolio}}", _uiState.value.personalInfo["githubField"] ?: "")
-        // Add other basic replacements here (e.g., summary, skills if they are simple placeholders)
+            .replace("{{SUMMARY}}", _uiState.value.summary.summary.replace("\n", "<br>"))
 
         // Handle education section (Generate the replacement HTML - Keep this part as is)
         val educationHtml = _uiState.value.education.joinToString("\n") { edu ->

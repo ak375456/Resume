@@ -37,6 +37,10 @@
             border-bottom: 1px solid #333;
             padding-bottom: 5px;
         }
+        .summary {
+        margin-bottom: 15px;
+        white-space: pre-line; /* This preserves line breaks */
+    }
 
         .education-item {
             margin-bottom: 0px;
@@ -90,6 +94,10 @@
         {{phone}} • {{email}} • {{linkedin}} • {{portfolio}}
     </div>
 </div>
+
+<!-- Summary Section -->
+<div class="section-title">SUMMARY</div>
+<div class="summary">{{SUMMARY}}</div>
 
 <!-- Education Section -->
 <div class="section-title">EDUCATION</div>

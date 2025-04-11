@@ -9,12 +9,17 @@ data class EditorState(
     val experiences: List<Experience> = emptyList(),
     val education: List<Education> = emptyList(),
     val skills: List<String> = emptyList(),
-    val summary: String = "",
+    val summary: Summary = Summary(),
     val isLoading: Boolean = false,
     val isGenerating: Boolean = false,
     val error: String? = null,
     val generatedPdfPath: String? = null,
     val showSuccessSnackbar: Boolean = false
+)
+
+data class Summary(
+    val id: String = UUID.randomUUID().toString(),
+    val summary: String = ""
 )
 
 

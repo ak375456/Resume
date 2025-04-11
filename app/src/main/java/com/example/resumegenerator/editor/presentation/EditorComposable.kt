@@ -5,28 +5,21 @@ import android.content.Intent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,17 +34,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.composables.icons.lucide.Lucide
-import com.composables.icons.lucide.Trash
 import com.example.resumegenerator.components.SuccessSnackbar
 import com.example.resumegenerator.components.SuccessSnackbarVisuals
-import com.example.resumegenerator.editor.presentation.components.BulletPointHandler
 import com.example.resumegenerator.editor.presentation.components.EducationItem
 import com.example.resumegenerator.editor.presentation.components.ExperienceItem
 import com.example.resumegenerator.editor.presentation.components.PersonalInfoSection
 import com.example.resumegenerator.editor.presentation.components.SectionHeader
+import com.example.resumegenerator.editor.presentation.components.SummarySection
 import com.example.resumegenerator.ui.theme.CVAppColors
-import com.example.util.textFieldColors
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -135,12 +125,12 @@ private fun EditorContent(
     onExperienceChange: (Experience) -> Unit,
     onEducationChange: (Education) -> Unit,
     onSkillChange: (List<String>) -> Unit,
-    onSummaryChange: (String) -> Unit,
+    onSummaryChange: (Summary) -> Unit,
     onAddExperience: () -> Unit,
     onAddEducation: () -> Unit,
     onGenerateClick: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: EditorViewModel = hiltViewModel()
+    viewModel: EditorViewModel = hiltViewModel(),
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val scrollState = rememberScrollState()
@@ -172,6 +162,16 @@ private fun EditorContent(
             PersonalInfoSection(
                 personalInfo = uiState.personalInfo,
                 onValueChange = onPersonalInfoChange,
+                isDarkTheme = isDarkTheme
+            )
+
+            //Summary Section
+            SectionHeader(
+                title = "Summary",
+            )
+            SummarySection(
+                summary = uiState.summary,
+                onSummaryChange = onSummaryChange,
                 isDarkTheme = isDarkTheme
             )
             // Education Section
@@ -237,8 +237,6 @@ private fun EditorContent(
         }
     }
 }
-
-
 
 fun openPdf(context: Context, pdfFile: File) {
     try {
