@@ -142,12 +142,7 @@ class EditorViewModel @Inject constructor(
 
         // 🔹 Generate and replace experience section
         val experienceHtml = _uiState.value.experiences.joinToString("\n") { exp ->
-
-            val descriptionHtml = if (exp.useBulletPoints) {
-                exp.description.lines().joinToString("<br>• ", "• ", "") { it.trim() }
-            } else {
-                exp.description.replace("\n", "<br>")
-            }
+            val descriptionHtml = exp.description.replace("\n", "<br>")
 
             """
     <div class="experience-item">
@@ -155,7 +150,7 @@ class EditorViewModel @Inject constructor(
             <div class="experience-role">${exp.jobTitle}, ${exp.company}</div>
             <div class="date">${exp.startDate} - ${exp.endDate}</div>
         </div>
-        <div class="experience-description">${descriptionHtml}</div>
+        <div class="experience-description">$descriptionHtml</div>
     </div>
     """.trimIndent()
         }
@@ -179,14 +174,7 @@ class EditorViewModel @Inject constructor(
         }
     }
 
-    // Add this to your EditorViewModel
-    fun toggleBulletPoints(experience: Experience) {
-        _uiState.value = _uiState.value.copy(
-            experiences = _uiState.value.experiences.map {
-                if (it.id == experience.id) it.copy(useBulletPoints = !it.useBulletPoints) else it
-            }
-        )
-    }
+
 
 
     fun dismissSnackbar() {

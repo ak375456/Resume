@@ -33,6 +33,5 @@ data class Experience(
     val startDate: String = "",
     val endDate: String = "",
     val description: String = "",
-    val useBulletPoints: Boolean = false
 )
 
